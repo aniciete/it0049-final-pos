@@ -1,47 +1,88 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="auth-card">
+        <header class="auth-header">
+            <h1 class="auth-title">Staff Sign In</h1>
+            <p class="auth-subtitle">
+                Enter your staff username or email address and password to access POS management and sales checkout.
+            </p>
+        </header>
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+        @include('partials.error_summary')
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <form method="POST" action="{{ route('login') }}" novalidate>
+            @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <div class="form-group">
+                <label for="login" class="form-label">Username or Email</label>
+                <input
+                    id="login"
+                    type="text"
+                    name="login"
+                    class="form-control"
+                    value="{{ old('login', old('email')) }}"
+                    autocomplete="username"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    placeholder="e.g. admin.reyes or admin.reyes@brightmarket.test"
+                    required
+                    autofocus
+                    aria-invalid="{{ ($errors->has('login') || $errors->has('email')) ? 'true' : 'false' }}"
+                    @if ($errors->has('login') || $errors->has('email')) aria-describedby="login_error" @endif
+                >
+                @if ($errors->has('login') || $errors->has('email'))
+                    <p id="login_error" class="form-field-error">{{ $errors->first('login') ?: $errors->first('email') }}</p>
+                @endif
+            </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-with-toggle">
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        autocomplete="current-password"
+                        required
+                        aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                        @error('password') aria-describedby="password_error" @enderror
+                    >
+                    <button
+                        type="button"
+                        class="password-toggle-btn"
+                        data-password-toggle="password"
+                        aria-controls="password"
+                        aria-pressed="false"
+                        aria-label="Show password"
+                    >Show</button>
+                </div>
+                @error('password')
+                    <p id="password_error" class="form-field-error">{{ $message }}</p>
+                @enderror
+            </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <div class="auth-meta-row">
+                <label for="remember_me" class="checkbox-inline">
+                    <input id="remember_me" type="checkbox" name="remember" class="checkbox-input" {{ old('remember') ? 'checked' : '' }}>
+                    <span>Keep me signed in</span>
+                </label>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+                @if (Route::has('password.request'))
+                    <a href="{{ route('password.request') }}" class="table-link">Forgot password?</a>
+                @endif
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+            <div class="form-actions">
+                <a href="{{ route('register') }}" class="button button-secondary">Register Account</a>
+                <button type="submit" class="button button-primary" data-busy-text="Signing in...">Sign In</button>
+            </div>
+        </form>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+        <aside class="auth-demo-note" aria-label="Seeded demo staff credentials">
+            <strong>Demo Staff Credentials:</strong><br>
+            Username: <code>admin.reyes</code> (or <code>admin.reyes@brightmarket.test</code>)<br>
+            Password: <code>POSDemo!2026</code>
+        </aside>
+    </div>
 </x-guest-layout>
