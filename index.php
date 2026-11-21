@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
 /**
  * Bright-Market Laravel POS — Root Entry Point for Shared Hosting (/htdocs).
  */
-
 if (file_exists(__DIR__.'/public/index.php')) {
     require_once __DIR__.'/public/index.php';
 } else {
@@ -15,8 +17,8 @@ if (file_exists(__DIR__.'/public/index.php')) {
 
     require __DIR__.'/vendor/autoload.php';
 
-    /** @var \Illuminate\Foundation\Application $app */
+    /** @var Application $app */
     $app = require_once __DIR__.'/bootstrap/app.php';
 
-    $app->handleRequest(\Illuminate\Http\Request::capture());
+    $app->handleRequest(Request::capture());
 }
