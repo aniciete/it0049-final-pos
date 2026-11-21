@@ -73,14 +73,12 @@ class Product extends Model
     public function imageUrl(): string
     {
         if ($this->hasImage()) {
-            $url = is_file(public_path('storage/'.$this->image))
-                ? Storage::disk('public')->url($this->image)
-                : route('media.show', ['folder' => 'products', 'filename' => basename($this->image)]);
-
-            return (string) preg_replace('~^https?:~', '', $url);
+            return is_file(public_path('storage/'.$this->image))
+                ? '/storage/'.ltrim($this->image, '/')
+                : route('media.show', ['folder' => 'products', 'filename' => basename($this->image)], false);
         }
 
-        return (string) preg_replace('~^https?:~', '', asset('assets/images/product-placeholder.svg'));
+        return '/assets/images/product-placeholder.svg';
     }
 
     /**

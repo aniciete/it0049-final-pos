@@ -127,14 +127,12 @@ class User extends Authenticatable
     public function avatarUrl(): string
     {
         if ($this->hasAvatar()) {
-            $url = is_file(public_path('storage/'.$this->avatar))
-                ? Storage::disk('public')->url($this->avatar)
-                : route('media.show', ['folder' => 'avatars', 'filename' => basename($this->avatar)]);
-
-            return (string) preg_replace('~^https?:~', '', $url);
+            return is_file(public_path('storage/'.$this->avatar))
+                ? '/storage/'.ltrim($this->avatar, '/')
+                : route('media.show', ['folder' => 'avatars', 'filename' => basename($this->avatar)], false);
         }
 
-        return (string) preg_replace('~^https?:~', '', asset('assets/images/avatar-placeholder.svg'));
+        return '/assets/images/avatar-placeholder.svg';
     }
 
     /**

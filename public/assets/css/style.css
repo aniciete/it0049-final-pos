@@ -1144,10 +1144,18 @@ code {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
         gap: var(--space-3);
         padding: 0.45rem 0;
         border-bottom: 1px solid var(--border-subtle);
         text-align: right;
+    }
+
+    .data-table tbody td > * {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     .data-table tbody td:last-child {
@@ -1796,8 +1804,21 @@ code {
         display: none;
     }
 
-    .session-user-tag {
+    .header-container {
+        gap: var(--space-2);
+    }
+
+    .header-session-zone {
+        gap: var(--space-2);
+    }
+
+    .session-user-tag,
+    .session-user-link span {
         display: none;
+    }
+
+    .session-user-link {
+        padding: 0.25rem;
     }
 }
 

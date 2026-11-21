@@ -53,23 +53,29 @@
                         <tr>
                             <td class="num-col mono-num" data-label="Receipt">#{{ $sale->id }}</td>
                             <td data-label="Product">
-                                <span class="cell-primary">{{ $sale->product?->name ?? 'Removed Product' }}</span>
-                                @if ($sale->product?->trashed())
-                                    <span class="cell-secondary">Archived SKU</span>
-                                @endif
+                                <div>
+                                    <span class="cell-primary">{{ $sale->product?->name ?? 'Removed Product' }}</span>
+                                    @if ($sale->product?->trashed())
+                                        <span class="cell-secondary">Archived SKU</span>
+                                    @endif
+                                </div>
                             </td>
                             <td data-label="Customer">
                                 @if ($sale->customer)
-                                    <span class="cell-primary">{{ $sale->customer->full_name }}</span>
-                                    <span class="cell-secondary">{{ $sale->customer->email }}</span>
+                                    <div>
+                                        <span class="cell-primary">{{ $sale->customer->full_name }}</span>
+                                        <span class="cell-secondary">{{ $sale->customer->email }}</span>
+                                    </div>
                                 @else
                                     <span class="status-pill status-low">Walk-in Customer</span>
                                 @endif
                             </td>
                             <td data-label="Staff Member">
                                 @if ($sale->seller)
-                                    <span class="cell-primary">{{ $sale->seller->full_name }}</span>
-                                    <span class="cell-secondary mono-num">{{ $sale->seller->username }}</span>
+                                    <div>
+                                        <span class="cell-primary">{{ $sale->seller->full_name }}</span>
+                                        <span class="cell-secondary mono-num">{{ $sale->seller->username }}</span>
+                                    </div>
                                 @else
                                     <span>System</span>
                                 @endif

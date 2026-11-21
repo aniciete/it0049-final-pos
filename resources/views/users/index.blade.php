@@ -56,8 +56,10 @@
                                 </div>
                             </td>
                             <td data-label="Username / Email">
-                                <span class="cell-primary mono-num">{{ $staff->username }}</span>
-                                <span class="cell-secondary">{{ $staff->email ?: 'No email linked' }}</span>
+                                <div>
+                                    <span class="cell-primary mono-num">{{ $staff->username }}</span>
+                                    <span class="cell-secondary">{{ $staff->email ?: 'No email linked' }}</span>
+                                </div>
                             </td>
                             <td data-label="Role">
                                 <span class="status-pill status-ok">{{ $staff->role }}</span>
