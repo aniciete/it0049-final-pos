@@ -21,6 +21,21 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Normalize either `login` (UI) or `email` (Breeze compatibility) into `login`.
+     */
+    protected function prepareForValidation(): void
+    {
+        $identifier = $this->input('login');
+        if ($identifier === null || trim((string) $identifier) === '') {
+            $identifier = $this->input('email');
+        }
+
+        $this->merge([
+            'login' => trim((string) ($identifier ?? '')),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -28,13 +43,26 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'login' => ['required', 'string', 'max:150'],
             'password' => ['required', 'string'],
         ];
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Get clear validation messages for the login form.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'login.required' => 'Username or email address is required.',
+            'password.required' => 'Password is required.',
+        ];
+    }
+
+    /**
+     * Attempt to authenticate using either email or username.
      *
      * @throws ValidationException
      */
@@ -42,11 +70,18 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $identifier = (string) $this->input('login');
+        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [
+            $field => $field === 'email' ? Str::lower($identifier) : $identifier,
+            'password' => (string) $this->input('password'),
+        ];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                $this->errorKey() => trans('auth.failed'),
             ]);
         }
 
@@ -69,7 +104,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            $this->errorKey() => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -81,6 +116,14 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+    }
+
+    /**
+     * Report errors under `email` when callers post Breeze's `email` key without `login`.
+     */
+    private function errorKey(): string
+    {
+        return $this->has('email') && ! $this->request->has('login') ? 'email' : 'login';
     }
 }
