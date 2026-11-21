@@ -1,58 +1,97 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Bright-Market Point-of-Sale (POS) System — Laravel 13
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Course:** IT0049 — Web System Technologies  
+**Framework:** Laravel 13 (PHP 8.3+)  
+**Authentication:** Laravel Breeze + `auth` middleware  
+**Image Processing & Storage:** Intervention Image (`intervention/image-laravel`) on `Storage::disk('public')`  
+**Database Compatibility:** SQLite (Local Development & PHPUnit Tests) and MySQL / MariaDB (Production & phpMyAdmin)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Bright-Market POS is a full-stack Point-of-Sale and Inventory Management application built strictly with Laravel MVC conventions. Authenticated staff operators can manage catalog products (with image uploads and soft-delete archiving), maintain customer and staff accounts (with avatars and bcrypt-hashed passwords), process counter sales inside atomic database transactions with strict stock protection, and inspect chronological sales history.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Application Routes
 
-## Learning Laravel
+| URI Pattern | HTTP Method(s) | Controller / Handler | Middleware | Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| `/` | `GET` | `PageController@home` | Public | Operational overview with live catalog, customer, staff, and sales counts |
+| `/about` | `GET` | `PageController@about` | Public | 4-table relational schema and security architecture overview |
+| `/login`, `/register` | `GET`, `POST` | Breeze Auth Controllers | `guest` | Staff sign-in (username or email) & account registration |
+| `/forgot-password`, `/reset-password` | `GET`, `POST` | Breeze Password Reset | `guest` | Password recovery flow |
+| `/dashboard` | `GET` | `PageController@dashboard` | `auth` | Authenticated KPI dashboard and recent transactions |
+| `/products` (`Route::resource`) | `GET/POST/PUT/PATCH/DELETE` | `ProductController` | `auth` | Product CRUD, image upload/preview, soft-delete archive & purge |
+| `/products/{product}/restore` | `POST` | `ProductController@restore` | `auth` | Restore archived product back to active inventory |
+| `/customers` (`Route::resource`) | `GET/POST/PUT/PATCH/DELETE` | `CustomerController` | `auth` | Customer directory CRUD (`sales.customer_id` preserved via `SET NULL`) |
+| `/users` (`Route::resource`) | `GET/POST/PUT/PATCH/DELETE` | `UserController` | `auth` | Staff accounts CRUD, 256&times;256 avatars, hashed passwords, deletion guards |
+| `/sales` | `GET` | `SaleController@index` | `auth` | Chronological sales history ledger + revenue & unit summary |
+| `/sales/create` | `GET` | `SaleController@create` | `auth` | Checkout register form with live order summary preview |
+| `/sales` | `POST` | `SaleController@store` | `auth` | Atomic transactional sale recording & stock deduction |
+| `/profile` | `GET/PATCH/DELETE` | `ProfileController` | `auth` | Personal profile and password management |
+| `/media/{folder}/{filename}` | `GET` | Closure (`Storage::disk('public')`) | `auth` | Serves stored `avatars` and `products` images when symlink is unavailable |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 2. Database Schema & Relationships
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Migrations are located in `database/migrations/`, seeders in `database/seeders/`, and a standalone MySQL DDL/DML export in [`database/pos_final.sql`](database/pos_final.sql).
 
-## Agentic Development
+- **`products`**: `id`, `name`, `price` (`decimal(10,2)`), `stock_quantity`, `image` (nullable), `timestamps`, `deleted_at` (`SoftDeletes`). One product may appear in many sales (`Product::sales()`).
+- **`customers`**: `id`, `full_name`, `email` (unique), `phone` (nullable), `timestamps`. Customer selection is optional during a sale (`Customer::sales()`).
+- **`users`**: `id`, `username` (unique), `full_name`, `email` (nullable, unique), `email_verified_at`, `password` (bcrypt hashed), `role`, `avatar` (nullable), `remember_token`, `timestamps`. One staff user records many sales (`User::sales()`).
+- **`sales`**: `id`, `product_id` (`FK -> products.id RESTRICT`), `customer_id` (`nullable FK -> customers.id SET NULL`), `sold_by` (`FK -> users.id RESTRICT`), `quantity`, `total_price` (`decimal(10,2)`), `timestamps`.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## 3. Local Development Setup
+
+### Prerequisites
+- PHP **8.3+** (`pdo_sqlite`, `pdo_mysql`, `mbstring`, `openssl`, `gd`, `zip`)
+- Composer **2.x** & Node.js / npm
+
+### Quickstart
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install && npm run build
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate:fresh --seed
+php artisan storage:link
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** and sign in at `/login` with any seeded staff account:
+- **Username or Email:** `admin.reyes` or `admin.reyes@brightmarket.test`
+- **Password:** `POSDemo!2026`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 4. Security, Validation & Transactional Integrity
 
-## Code of Conduct
+- **Server-Side Validation**: Dedicated Form Requests (`SaveProductRequest`, `SaveCustomerRequest`, `SaveUserRequest`, `StoreSaleRequest`, `Auth\LoginRequest`) trim and validate all inputs before database writes.
+- **Transactional Stock Protection (`App\Services\SaleService`)**: Executes inside `DB::transaction()`, checks product active state, runs a conditional atomic `UPDATE` (`stock_quantity >= quantity`), computes `total_price` server-side, and rejects overselling with zero inventory mutation or partial sale rows.
+- **Safe Media Uploads (`App\Services\ImageUploadService`)**: Restricts uploads to JPG/PNG/WebP (&le; 2 MB), decodes bytes via Intervention Image, resizes cleanly (`640x640` products, `256x256` avatars), stores under `Storage::disk('public')`, and cleans up replaced images only after database persistence succeeds.
+- **Authentication, CSRF & Hashing**: Breeze session authentication, `auth` middleware on all POS modules, `@csrf` tokens on all mutating forms, and Laravel `Hash::make()` / `'hashed'` model casts.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 5. Automated Testing & Packaging
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Run the full test suite and Laravel Pint code style check:
+```bash
+php artisan test
+./vendor/bin/pint --test
+```
 
-## License
+Generate a clean Canvas submission ZIP (excluding `node_modules`, `vendor`, `.git`, and local `.env` secrets):
+```bash
+./build-submission-zip.sh
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Build and upload a lean InfinityFree deployment archive using gitignored `.deploy.env` and `.env.production`:
+```bash
+./build-infinityfree-zip.sh
+./deploy-infinityfree.sh
+```
