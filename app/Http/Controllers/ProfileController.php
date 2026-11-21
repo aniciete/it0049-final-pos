@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ImageUploadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +41,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, ImageUploadService $imageService): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -48,9 +49,20 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        if ($user->sales()->exists()) {
+            return Redirect::route('profile.edit')
+                ->with('error', 'Staff accounts with recorded sales cannot be deleted.');
+        }
+
+        $avatarPath = $user->avatar;
+
         Auth::logout();
 
         $user->delete();
+
+        if ($avatarPath !== null) {
+            $imageService->delete($avatarPath);
+        }
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
