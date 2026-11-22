@@ -98,7 +98,7 @@
             autocomplete="new-password"
             :required="! $isEdit"
             error-id="user_password_error"
-            :hint="$isEdit ? 'Leave blank to keep the current password.' : null"
+            :hint="$isEdit ? 'Leave blank to keep the current password.' : 'Minimum 8 characters.'"
         />
 
         <x-password-input
@@ -121,11 +121,7 @@
         :default-src="$user->avatarUrl()"
         :alt="($user->full_name ?: 'Staff').' avatar preview'"
         :has-media="$user->hasAvatar()"
-        active-status="Current avatar active."
-        empty-status="No custom avatar uploaded."
-        help-text="Optional. JPG, PNG, or WebP up to 2 MB, cropped to 256x256."
         remove-name="remove_avatar"
-        remove-label="Remove existing avatar on save"
         error-id="user_avatar_error"
         :is-edit="$isEdit"
     />

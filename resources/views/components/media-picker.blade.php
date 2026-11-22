@@ -7,11 +7,9 @@
     'defaultSrc',
     'alt',
     'hasMedia' => false,
-    'activeStatus' => 'Current photo active.',
-    'emptyStatus' => 'No custom photo uploaded.',
     'helpText' => 'Optional. JPG, PNG, or WebP up to 2 MB.',
     'removeName' => null,
-    'removeLabel' => 'Remove existing photo on save',
+    'removeLabel' => 'Remove current photo on save',
     'errorId' => null,
     'isEdit' => false,
 ])
@@ -40,9 +38,7 @@
                     <x-icon name="upload" :size="15" />
                     <span>Choose Photo</span>
                 </button>
-                <span id="{{ $statusId }}" class="form-hint" style="font-weight: 600; color: var(--ink-primary);">
-                    {{ $hasMedia ? $activeStatus : $emptyStatus }}
-                </span>
+                <span id="{{ $statusId }}" class="form-hint media-selected-status" aria-live="polite"></span>
             </div>
             <p class="form-hint">{{ $helpText }}</p>
         </div>

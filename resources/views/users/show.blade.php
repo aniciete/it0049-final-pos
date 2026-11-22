@@ -65,7 +65,6 @@
 
         <x-recent-sales-panel
             title="Recent Sales"
-            subtitle="Latest receipts processed by this staff member."
             :sales="$recentSales"
             empty-text="No sales recorded by this staff member yet."
             :show-seller="false"

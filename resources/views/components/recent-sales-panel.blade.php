@@ -1,6 +1,5 @@
 @props([
     'title' => 'Recent Sales',
-    'subtitle' => null,
     'sales',
     'emptyText' => 'No sales recorded yet.',
     'filterUrl' => null,
@@ -10,16 +9,12 @@
 ])
 
 <aside class="context-panel" aria-label="{{ $title }}">
-    <div class="section-header-row" style="margin-bottom: var(--space-1);">
+    <div class="section-header-row" style="margin-bottom: var(--space-3);">
         <h2 class="context-panel-title">{{ $title }}</h2>
         @if ($filterUrl)
-            <a href="{{ $filterUrl }}" class="table-link" style="font-size: var(--text-xs);">View in Sales History</a>
+            <a href="{{ $filterUrl }}" class="table-link context-panel-action">View in Sales History</a>
         @endif
     </div>
-
-    @if ($subtitle)
-        <p class="context-panel-sub">{{ $subtitle }}</p>
-    @endif
 
     @if ($sales->isEmpty())
         <p class="section-meta">{{ $emptyText }}</p>
@@ -27,23 +22,34 @@
         <ul class="context-list">
             @foreach ($sales as $sale)
                 <li class="context-list-item">
-                    <div style="min-width: 0;">
-                        <a href="{{ route('sales.show', $sale) }}" class="table-link mono-num">#{{ $sale->id }}</a>
-                        @if ($showProduct)
-                            <span style="font-weight: 500;">{{ $sale->product?->name ?? 'Archived item' }}</span>
-                        @endif
-                        <span class="cell-secondary">
-                            Qty {{ $sale->quantity }}
-                            @if ($showCustomer)
-                                &middot; {{ $sale->customer?->full_name ?? 'Walk-in' }}
-                            @endif
-                            @if ($showSeller && $sale->seller)
-                                &middot; {{ $sale->seller->full_name }}
-                            @endif
-                            &middot; {{ $sale->created_at?->format('M j, Y') }}
+                    <a href="{{ route('sales.show', $sale) }}" class="context-list-link">
+                        <span class="context-list-top">
+                            <span class="context-list-top-main">
+                                <span class="mono-num context-receipt-id">#{{ $sale->id }}</span>
+                                @if ($showProduct)
+                                    <span>{{ $sale->quantity }}× {{ $sale->product?->name ?? 'Archived item' }}</span>
+                                @else
+                                    <span>{{ $sale->quantity }} {{ \Illuminate\Support\Str::plural('unit', $sale->quantity) }}</span>
+                                @endif
+                            </span>
+                            <span class="context-list-top-meta">
+                                <span class="mono-num context-amount">${{ number_format((float) $sale->total_price, 2) }}</span>
+                                <x-icon name="caret-right" :size="14" class="context-chevron" />
+                            </span>
                         </span>
-                    </div>
-                    <span class="mono-num" style="font-weight: 700; flex-shrink: 0;">${{ number_format((float) $sale->total_price, 2) }}</span>
+                        <span class="context-list-bottom">
+                            <span>
+                                @if (! $showCustomer)
+                                    by {{ $sale->seller?->full_name ?? 'System' }}
+                                @elseif (! $showSeller)
+                                    {{ $sale->customer?->full_name ?? 'Walk-in' }}
+                                @else
+                                    {{ $sale->customer?->full_name ?? 'Walk-in' }}, by {{ $sale->seller?->full_name ?? 'System' }}
+                                @endif
+                            </span>
+                            <span class="mono-num">{{ $sale->created_at?->format('M j, Y') }}</span>
+                        </span>
+                    </a>
                 </li>
             @endforeach
         </ul>

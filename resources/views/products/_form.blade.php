@@ -73,11 +73,7 @@
         :default-src="$product->imageUrl()"
         :alt="($product->name ?: 'Product').' preview'"
         :has-media="$product->hasImage()"
-        active-status="Current product photo active."
-        empty-status="No custom photo uploaded."
-        help-text="Optional. JPG, PNG, or WebP up to 2 MB, resized cleanly to 640x640."
         remove-name="remove_image"
-        remove-label="Remove existing product image on save"
         error-id="product_image_error"
         :is-edit="$isEdit"
     />

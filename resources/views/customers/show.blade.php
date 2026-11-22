@@ -56,7 +56,6 @@
 
         <x-recent-sales-panel
             title="Linked Orders"
-            subtitle="Latest sales attached to this customer."
             :sales="$recentSales"
             empty-text="No orders linked to this customer yet."
             :show-customer="false"

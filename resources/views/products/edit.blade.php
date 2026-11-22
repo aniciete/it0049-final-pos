@@ -34,7 +34,6 @@
 
         <x-recent-sales-panel
             title="Recent Sales"
-            subtitle="Latest receipts including this item."
             :sales="$recentSales"
             empty-text="No sales recorded for this product yet."
             :show-product="false"

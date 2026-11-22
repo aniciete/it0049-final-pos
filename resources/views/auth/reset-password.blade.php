@@ -26,6 +26,7 @@
                 autocomplete="new-password"
                 :required="true"
                 error-id="reset_password_error"
+                hint="Minimum 8 characters."
             />
 
             <x-password-input

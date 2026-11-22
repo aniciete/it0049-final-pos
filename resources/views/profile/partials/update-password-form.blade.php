@@ -25,6 +25,7 @@
                     autocomplete="new-password"
                     error-bag="updatePassword"
                     error-id="update_new_password_error"
+                    hint="Minimum 8 characters."
                 />
 
                 <x-password-input

@@ -54,6 +54,7 @@
                 autocomplete="new-password"
                 :required="true"
                 error-id="password_error"
+                hint="Minimum 8 characters."
             />
 
             <x-password-input
