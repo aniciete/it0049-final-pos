@@ -95,8 +95,13 @@ class SaleController extends Controller
             ->route('sales.index')
             ->with(
                 'success',
-                "Sale #{$sale->id} recorded: {$quantity}x {$product->name} (\${$sale->total_price}). Remaining stock: {$remaining}."
-            );
+                "Sale #{$sale->id} recorded: {$quantity}× {$product->name} (\${$sale->total_price}). Remaining stock: {$remaining}."
+            )
+            ->with('success_link', [
+                'url' => route('sales.show', $sale),
+                'label' => "View Receipt #{$sale->id}",
+            ])
+            ->with('highlight_sale_id', $sale->id);
     }
 
     /**

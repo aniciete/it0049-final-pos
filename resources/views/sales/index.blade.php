@@ -7,6 +7,7 @@
         || ($filters['customer'] ?? null) !== null
         || ($filters['from'] ?? '') !== ''
         || ($filters['to'] ?? '') !== '';
+    $highlightSaleId = session('highlight_sale_id');
 @endphp
 
 <div class="container">
@@ -23,7 +24,7 @@
         </div>
     </header>
 
-    <div class="ledger-filter-bar">
+    <div class="ledger-summary-band">
         <div class="metric-summary-strip" aria-label="Sales Summary">
             <div class="metric-summary-item">
                 <span class="metric-label">Transactions</span>
@@ -38,55 +39,60 @@
                 <span class="metric-value mono-num">${{ number_format($summary['total_revenue'], 2) }}</span>
             </div>
         </div>
+    </div>
 
-        <form method="GET" action="{{ route('sales.index') }}" class="ledger-search-form" role="search" aria-label="Filter sales history">
-            @if ($filters['staff'])
-                <input type="hidden" name="staff" value="{{ $filters['staff'] }}">
-            @endif
-            @if ($filters['customer'])
-                <input type="hidden" name="customer" value="{{ $filters['customer'] }}">
-            @endif
+    <form method="GET" action="{{ route('sales.index') }}" class="ledger-filter-panel" role="search" aria-label="Filter sales history">
+        @if ($filters['staff'])
+            <input type="hidden" name="staff" value="{{ $filters['staff'] }}">
+        @endif
+        @if ($filters['customer'])
+            <input type="hidden" name="customer" value="{{ $filters['customer'] }}">
+        @endif
 
-            <label for="sales-search" class="visually-hidden">Search sales by receipt, product, customer, or cashier</label>
-            <input
-                type="search"
-                id="sales-search"
-                name="q"
-                value="{{ $filters['q'] }}"
-                placeholder="Search receipt, item, customer..."
-                class="form-control ledger-search-input"
-            >
+        <div class="filter-field filter-field-search">
+            <label for="sales-search" class="filter-field-label">Search Ledger</label>
+            <div class="input-with-leading-icon">
+                <x-icon name="search" :size="15" class="input-leading-icon" />
+                <input
+                    type="search"
+                    id="sales-search"
+                    name="q"
+                    value="{{ $filters['q'] }}"
+                    placeholder="Receipt #, product, customer, cashier..."
+                    class="form-control ledger-search-input"
+                >
+            </div>
+        </div>
 
-            <label for="sales-from" class="visually-hidden">From date</label>
+        <div class="filter-field filter-field-date">
+            <label for="sales-from" class="filter-field-label">From</label>
             <input
                 type="date"
                 id="sales-from"
                 name="from"
                 value="{{ $filters['from'] }}"
                 class="form-control ledger-date-input"
-                title="From date"
             >
+        </div>
 
-            <label for="sales-to" class="visually-hidden">To date</label>
+        <div class="filter-field filter-field-date">
+            <label for="sales-to" class="filter-field-label">To</label>
             <input
                 type="date"
                 id="sales-to"
                 name="to"
                 value="{{ $filters['to'] }}"
                 class="form-control ledger-date-input"
-                title="To date"
             >
+        </div>
 
-            <button type="submit" class="button button-secondary button-sm">
-                <x-icon name="search" :size="14" />
-                <span>Filter</span>
-            </button>
-
+        <div class="filter-actions">
+            <button type="submit" class="button button-secondary filter-apply-btn">Apply</button>
             @if ($hasFilters)
-                <a href="{{ route('sales.index') }}" class="button button-ghost-action button-sm">Clear</a>
+                <a href="{{ route('sales.index') }}" class="button button-ghost-action">Clear</a>
             @endif
-        </form>
-    </div>
+        </div>
+    </form>
 
     @if ($staffFilterUser || $customerFilterRecord)
         <div class="filter-bar" style="margin-top: calc(var(--space-2) * -1);">
@@ -101,7 +107,7 @@
                         Customer: {{ $customerFilterRecord->full_name }}
                     </span>
                 @endif
-                <a href="{{ route('sales.index') }}" class="table-link" style="font-size: var(--text-xs);">Reset filter</a>
+                <a href="{{ route('sales.index') }}" class="table-link" style="font-size: var(--text-meta);">Reset filter</a>
             </div>
         </div>
     @endif
@@ -141,9 +147,9 @@
                 </thead>
                 <tbody>
                     @foreach ($sales as $sale)
-                        <tr>
+                        <tr class="{{ (int) $highlightSaleId === (int) $sale->id ? 'row-just-created' : '' }}">
                             <td class="num-col mono-num" data-label="Receipt">
-                                <a href="{{ route('sales.show', $sale) }}" class="table-link">#{{ $sale->id }}</a>
+                                <a href="{{ route('sales.show', $sale) }}" class="table-link ledger-receipt-link">#{{ $sale->id }}</a>
                             </td>
                             <td data-label="Product">
                                 <div>

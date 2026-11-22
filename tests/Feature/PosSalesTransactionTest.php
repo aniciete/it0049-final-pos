@@ -35,6 +35,8 @@ class PosSalesTransactionTest extends TestCase
 
         $response->assertRedirect(route('sales.index'));
         $response->assertSessionHas('success');
+        $response->assertSessionHas('success_link');
+        $response->assertSessionHas('highlight_sale_id');
 
         $product->refresh();
         $this->assertSame(6, $product->stock_quantity);
@@ -52,7 +54,11 @@ class PosSalesTransactionTest extends TestCase
             ->assertSee('Roasted Arabica Beans')
             ->assertSee('Teresa Mendoza')
             ->assertSee('Daniel Valdez')
-            ->assertSee('$43.50');
+            ->assertSee('$43.50')
+            ->assertSee('Search Ledger')
+            ->assertSee('From')
+            ->assertSee('To')
+            ->assertSee('Apply');
     }
 
     public function test_walk_in_sale_with_null_customer_succeeds(): void
