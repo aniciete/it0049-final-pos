@@ -106,6 +106,7 @@ class PosSalesTransactionTest extends TestCase
         $response->assertOk();
         $response->assertSee('Insufficient stock for Raw Wildflower Honey 350g. Only 3 units available.');
         $response->assertSee('Set to 3');
+        $this->assertMatchesRegularExpression('/<button[^>]*id="complete-sale-btn"[^>]*disabled/s', $response->getContent());
 
         $product->refresh();
         $this->assertSame(3, $product->stock_quantity);

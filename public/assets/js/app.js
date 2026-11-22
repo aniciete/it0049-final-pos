@@ -373,18 +373,22 @@
     function initSalePreview() {
         const productSelect = document.getElementById('sale-product');
         const qtyInput = document.getElementById('sale-quantity');
+        const itemOut = document.getElementById('preview-item-summary');
         const priceOut = document.getElementById('preview-unit-price');
         const remainingOut = document.getElementById('preview-remaining-stock');
         const totalOut = document.getElementById('preview-order-total');
-        const warningEl = document.getElementById('preview-stock-warning');
         const decBtn = document.getElementById('qty-decrement');
         const incBtn = document.getElementById('qty-increment');
         const recoveryBtn = document.getElementById('qty-set-max');
+        const submitBtn = document.getElementById('complete-sale-btn');
+        const skuSearch = document.getElementById('sku-picker-search');
+        const skuEmptyMsg = document.getElementById('sku-empty-filter');
+        const skuTiles = Array.from(document.querySelectorAll('[data-sku-tile]'));
 
         if (
             !(productSelect instanceof HTMLSelectElement) ||
             !(qtyInput instanceof HTMLInputElement) ||
-            !priceOut || !remainingOut || !totalOut || !warningEl
+            !priceOut || !remainingOut || !totalOut
         ) {
             return;
         }
@@ -392,12 +396,17 @@
         let serverInvalidQty = qtyInput.getAttribute('aria-invalid') === 'true';
         const initialQtyValue = qtyInput.value;
 
+        const feedbackRow = document.getElementById('sale_quantity_feedback');
         const qtyErrorEl = document.getElementById('sale_quantity_error');
         const formErrorSummary = document.getElementById('form-error-summary');
+
         const clearServerOversell = () => {
             serverInvalidQty = false;
+            if (feedbackRow) {
+                feedbackRow.hidden = true;
+            }
             if (qtyErrorEl) {
-                qtyErrorEl.hidden = true;
+                qtyErrorEl.textContent = '';
             }
             if (formErrorSummary) {
                 formErrorSummary.hidden = true;
@@ -406,6 +415,48 @@
                 recoveryBtn.hidden = true;
             }
         };
+
+        const syncSkuTiles = () => {
+            const activeId = productSelect.value;
+            skuTiles.forEach((tile) => {
+                const match = tile.dataset.productId === activeId;
+                tile.classList.toggle('is-selected', match);
+                tile.setAttribute('aria-pressed', match ? 'true' : 'false');
+            });
+        };
+
+        skuTiles.forEach((tile) => {
+            tile.addEventListener('click', () => {
+                const id = tile.dataset.productId || '';
+                if (productSelect.value !== id) {
+                    productSelect.value = id;
+                    clearServerOversell();
+                    updateSummary(true);
+                } else {
+                    syncSkuTiles();
+                }
+            });
+        });
+
+        if (skuSearch instanceof HTMLInputElement && skuTiles.length > 0) {
+            skuSearch.addEventListener('input', () => {
+                const query = skuSearch.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                skuTiles.forEach((tile) => {
+                    const haystack = tile.dataset.searchText || '';
+                    const matches = query === '' || haystack.includes(query);
+                    tile.hidden = !matches;
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                if (skuEmptyMsg) {
+                    skuEmptyMsg.hidden = visibleCount > 0;
+                }
+            });
+        }
 
         if (serverInvalidQty) {
             qtyInput.focus();
@@ -416,18 +467,34 @@
                 clearServerOversell();
             }
 
+            syncSkuTiles();
+
             const option = productSelect.options[productSelect.selectedIndex];
             if (!option || !option.value) {
+                if (itemOut) {
+                    itemOut.textContent = 'No item selected';
+                    itemOut.classList.add('cell-muted');
+                }
                 priceOut.textContent = '$0.00';
                 remainingOut.textContent = 'Select product';
                 remainingOut.classList.remove('mono-num', 'is-oversell');
                 totalOut.textContent = '$0.00';
-                warningEl.hidden = true;
+                totalOut.classList.remove('is-oversell');
                 qtyInput.removeAttribute('max');
                 qtyInput.setAttribute('aria-invalid', serverInvalidQty ? 'true' : 'false');
+                if (decBtn instanceof HTMLButtonElement) {
+                    decBtn.disabled = true;
+                }
+                if (incBtn instanceof HTMLButtonElement) {
+                    incBtn.disabled = true;
+                }
+                if (submitBtn instanceof HTMLButtonElement) {
+                    submitBtn.disabled = true;
+                }
                 return;
             }
 
+            const name = option.dataset.name || option.textContent.trim();
             const price = parseFloat(option.dataset.price || '0');
             const stock = parseInt(option.dataset.stock || '0', 10);
             qtyInput.setAttribute('max', String(stock));
@@ -438,18 +505,57 @@
             const validQty = isWholePositive ? parsedNum : 0;
             const remaining = stock - validQty;
             const total = price * validQty;
+            const oversell = validQty > stock;
+            const invalidNumber = !isWholePositive;
+
+            if (itemOut) {
+                if (isWholePositive) {
+                    itemOut.textContent = `${validQty} × ${name}`;
+                    itemOut.classList.remove('cell-muted');
+                } else {
+                    itemOut.textContent = name;
+                    itemOut.classList.remove('cell-muted');
+                }
+            }
 
             priceOut.textContent = '$' + price.toFixed(2);
             remainingOut.textContent = validQty > 0 ? String(remaining) : String(stock);
             remainingOut.classList.add('mono-num');
-            totalOut.textContent = '$' + total.toFixed(2);
-
-            const oversell = validQty > stock;
             remainingOut.classList.toggle('is-oversell', oversell);
-            warningEl.hidden = !oversell || (serverInvalidQty && qtyErrorEl && !qtyErrorEl.hidden);
 
-            const isInvalid = oversell || (rawTrimmed !== '' && !isWholePositive);
+            if (oversell || invalidNumber) {
+                totalOut.textContent = 'n/a';
+                totalOut.classList.add('is-oversell');
+            } else {
+                totalOut.textContent = '$' + total.toFixed(2);
+                totalOut.classList.remove('is-oversell');
+            }
+
+            if (oversell && feedbackRow && qtyErrorEl && !serverInvalidQty) {
+                const unitLabel = stock === 1 ? 'unit' : 'units';
+                qtyErrorEl.textContent = `Insufficient stock for ${name}. Only ${stock} ${unitLabel} available.`;
+                if (recoveryBtn) {
+                    recoveryBtn.dataset.maxStock = String(stock);
+                    recoveryBtn.textContent = `Set to ${stock}`;
+                    recoveryBtn.hidden = stock <= 0;
+                }
+                feedbackRow.hidden = false;
+            } else if (!oversell && !serverInvalidQty && feedbackRow) {
+                feedbackRow.hidden = true;
+            }
+
+            const isInvalid = oversell || (rawTrimmed !== '' && invalidNumber);
             qtyInput.setAttribute('aria-invalid', (isInvalid || serverInvalidQty) ? 'true' : 'false');
+
+            if (decBtn instanceof HTMLButtonElement) {
+                decBtn.disabled = !isWholePositive || validQty <= 1;
+            }
+            if (incBtn instanceof HTMLButtonElement) {
+                incBtn.disabled = validQty >= stock;
+            }
+            if (submitBtn instanceof HTMLButtonElement) {
+                submitBtn.disabled = !isWholePositive || oversell;
+            }
         };
 
         const stepQuantity = (delta) => {

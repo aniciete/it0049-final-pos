@@ -150,5 +150,9 @@ class PosLayoutTest extends TestCase
         $this->assertStringContainsString('Add Product', $createProductHtml);
         $this->assertStringContainsString('Catalog Preview', $createProductHtml);
         $this->assertStringNotContainsString('Save Product', $createProductHtml);
+
+        $recordSaleHtml = $this->actingAs($staff)->get(route('sales.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('sku-picker-grid', $recordSaleHtml);
+        $this->assertStringNotContainsString('Walk-in Customer', $recordSaleHtml);
     }
 }
