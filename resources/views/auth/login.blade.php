@@ -62,11 +62,19 @@
         <p class="auth-secondary-link-row">
             Need an account? <a href="{{ route('register') }}" class="table-link">Register</a>
         </p>
-    </div>
 
-    @if (config('app.demo_hint'))
-        <p class="auth-demo-caption">
-            Demo account: <code>admin.reyes</code> / <code>POSDemo!2026</code>
-        </p>
-    @endif
+        @if (config('app.demo_hint'))
+            <div class="auth-demo-footer">
+                <button
+                    type="button"
+                    class="button button-secondary button-sm"
+                    data-fill-demo-login
+                    data-demo-user="admin.reyes"
+                    data-demo-pass="POSDemo!2026"
+                >
+                    Fill Demo Credentials
+                </button>
+            </div>
+        @endif
+    </div>
 </x-guest-layout>

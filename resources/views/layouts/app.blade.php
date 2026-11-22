@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{{ preg_replace('~^https?:~', '', asset('assets/css/style.css')) }}?v={{ @filemtime(public_path('assets/css/style.css')) ?: '1' }}">
     <script src="{{ preg_replace('~^https?:~', '', asset('assets/js/app.js')) }}?v={{ @filemtime(public_path('assets/js/app.js')) ?: '1' }}" defer></script>
 </head>
+@php
+    $isAuthRoute = request()->routeIs('login', 'register', 'password.*', 'verification.*');
+@endphp
 <body class="page-{{ $activePage ?? 'home' }}">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -24,58 +27,60 @@
                 </a>
             </div>
 
-            <nav class="site-nav" aria-label="Main Navigation">
-                <button
-                    type="button"
-                    class="nav-menu-toggle"
-                    popovertarget="main-nav-menu"
-                    popovertargetaction="toggle"
-                    aria-controls="main-nav-menu"
-                    aria-expanded="false"
-                >
-                    <x-icon name="list" :size="16" />
-                    <span>Menu</span>
-                </button>
-                <ul id="main-nav-menu" class="nav-list">
-                    <li class="nav-item">
-                        <a href="{{ route('home') }}" class="nav-link {{ ($activePage ?? '') === 'home' ? 'active' : '' }}" {!! ($activePage ?? '') === 'home' ? 'aria-current="page"' : '' !!}>Home</a>
-                    </li>
-                    @auth
+            @unless ($isAuthRoute)
+                <nav class="site-nav" aria-label="Main Navigation">
+                    <button
+                        type="button"
+                        class="nav-menu-toggle"
+                        popovertarget="main-nav-menu"
+                        popovertargetaction="toggle"
+                        aria-controls="main-nav-menu"
+                        aria-expanded="false"
+                    >
+                        <x-icon name="list" :size="16" />
+                        <span>Menu</span>
+                    </button>
+                    <ul id="main-nav-menu" class="nav-list">
                         <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link {{ ($activePage ?? '') === 'dashboard' || request()->routeIs('dashboard') ? 'active' : '' }}" {!! ($activePage ?? '') === 'dashboard' || request()->routeIs('dashboard') ? 'aria-current="page"' : '' !!}>Dashboard</a>
+                            <a href="{{ route('home') }}" class="nav-link {{ ($activePage ?? '') === 'home' ? 'active' : '' }}" {!! ($activePage ?? '') === 'home' ? 'aria-current="page"' : '' !!}>Home</a>
                         </li>
-                    @endauth
-                    <li class="nav-item">
-                        <a href="{{ route('products.index') }}" class="nav-link {{ ($activePage ?? '') === 'products' ? 'active' : '' }}" {!! ($activePage ?? '') === 'products' ? 'aria-current="page"' : '' !!}>Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('sales.create') }}" class="nav-link {{ ($activePage ?? '') === 'sales_create' ? 'active' : '' }}" {!! ($activePage ?? '') === 'sales_create' ? 'aria-current="page"' : '' !!}>Record Sale</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('sales.index') }}" class="nav-link {{ ($activePage ?? '') === 'sales' ? 'active' : '' }}" {!! ($activePage ?? '') === 'sales' ? 'aria-current="page"' : '' !!}>Sales History</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('customers.index') }}" class="nav-link {{ ($activePage ?? '') === 'customers' ? 'active' : '' }}" {!! ($activePage ?? '') === 'customers' ? 'aria-current="page"' : '' !!}>Customers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('users.index') }}" class="nav-link {{ ($activePage ?? '') === 'users' ? 'active' : '' }}" {!! ($activePage ?? '') === 'users' ? 'aria-current="page"' : '' !!}>Staff</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('about') }}" class="nav-link {{ ($activePage ?? '') === 'about' ? 'active' : '' }}" {!! ($activePage ?? '') === 'about' ? 'aria-current="page"' : '' !!}>About</a>
-                    </li>
-                    @auth
-                        <li class="nav-item nav-item-mobile-only">
-                            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                                @csrf
-                                <button type="submit" class="nav-link nav-logout-btn">
-                                    <x-icon name="sign-out" :size="15" />
-                                    <span>Log Out</span>
-                                </button>
-                            </form>
+                        @auth
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard') }}" class="nav-link {{ ($activePage ?? '') === 'dashboard' || request()->routeIs('dashboard') ? 'active' : '' }}" {!! ($activePage ?? '') === 'dashboard' || request()->routeIs('dashboard') ? 'aria-current="page"' : '' !!}>Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('products.index') }}" class="nav-link {{ ($activePage ?? '') === 'products' ? 'active' : '' }}" {!! ($activePage ?? '') === 'products' ? 'aria-current="page"' : '' !!}>Products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sales.create') }}" class="nav-link {{ ($activePage ?? '') === 'sales_create' ? 'active' : '' }}" {!! ($activePage ?? '') === 'sales_create' ? 'aria-current="page"' : '' !!}>Record Sale</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sales.index') }}" class="nav-link {{ ($activePage ?? '') === 'sales' ? 'active' : '' }}" {!! ($activePage ?? '') === 'sales' ? 'aria-current="page"' : '' !!}>Sales History</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('customers.index') }}" class="nav-link {{ ($activePage ?? '') === 'customers' ? 'active' : '' }}" {!! ($activePage ?? '') === 'customers' ? 'aria-current="page"' : '' !!}>Customers</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('users.index') }}" class="nav-link {{ ($activePage ?? '') === 'users' ? 'active' : '' }}" {!! ($activePage ?? '') === 'users' ? 'aria-current="page"' : '' !!}>Staff</a>
+                            </li>
+                        @endauth
+                        <li class="nav-item">
+                            <a href="{{ route('about') }}" class="nav-link {{ ($activePage ?? '') === 'about' ? 'active' : '' }}" {!! ($activePage ?? '') === 'about' ? 'aria-current="page"' : '' !!}>About</a>
                         </li>
-                    @endauth
-                </ul>
-            </nav>
+                        @auth
+                            <li class="nav-item nav-item-mobile-only">
+                                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                                    @csrf
+                                    <button type="submit" class="nav-link nav-logout-btn">
+                                        <x-icon name="sign-out" :size="15" />
+                                        <span>Log Out</span>
+                                    </button>
+                                </form>
+                            </li>
+                        @endauth
+                    </ul>
+                </nav>
+            @endunless
 
             <div class="header-session-zone">
                 @auth
@@ -103,13 +108,13 @@
                         </button>
                     </form>
                 @else
-                    @if (! request()->routeIs('login'))
+                    @if ($isAuthRoute)
+                        <a href="{{ route('about') }}" class="nav-link">About</a>
+                    @else
                         <a href="{{ route('login') }}" class="button button-secondary button-sm">
                             <x-icon name="sign-in" :size="14" />
                             <span>Sign In</span>
                         </a>
-                    @else
-                        <a href="{{ route('home') }}" class="nav-link">Overview</a>
                     @endif
                 @endauth
             </div>
@@ -119,12 +124,12 @@
     <main id="main-content" class="site-main" role="main" tabindex="-1">
         @include('partials.flash')
 
-        @if (isset($slot))
+        @hasSection('content')
+            @yield('content')
+        @elseif (isset($slot))
             <div class="container">
                 {{ $slot }}
             </div>
-        @else
-            @yield('content')
         @endif
     </main>
 

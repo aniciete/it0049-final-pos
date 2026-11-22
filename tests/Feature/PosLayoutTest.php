@@ -67,12 +67,13 @@ class PosLayoutTest extends TestCase
         config(['app.demo_hint' => false]);
         $this->get(route('login'))
             ->assertOk()
-            ->assertDontSee('POSDemo!2026');
+            ->assertDontSee('POSDemo!2026')
+            ->assertDontSee('Fill Demo Credentials');
 
         config(['app.demo_hint' => true]);
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee('POSDemo!2026');
+            ->assertSee('Fill Demo Credentials');
 
         $product = Product::query()->create(['name' => 'Counter Roast', 'price' => '12.34', 'stock_quantity' => 5]);
         $staff = User::factory()->create();
@@ -88,6 +89,26 @@ class PosLayoutTest extends TestCase
             ->assertOk()
             ->assertDontSee('$12.34')
             ->assertDontSee('gross');
+    }
+
+    public function test_guest_navigation_hides_internal_routes_and_auth_renders_auth_shell(): void
+    {
+        foreach ([route('home'), route('about')] as $uri) {
+            $html = $this->get($uri)->assertOk()->getContent();
+            $headerEnd = strpos($html, '</header>');
+            $headerHtml = $headerEnd !== false ? substr($html, 0, $headerEnd) : $html;
+
+            $this->assertStringNotContainsString(route('products.index'), $headerHtml);
+            $this->assertStringNotContainsString(route('sales.create'), $headerHtml);
+            $this->assertStringNotContainsString(route('sales.index'), $headerHtml);
+            $this->assertStringNotContainsString(route('customers.index'), $headerHtml);
+            $this->assertStringNotContainsString(route('users.index'), $headerHtml);
+            $this->assertStringNotContainsString(route('dashboard'), $headerHtml);
+        }
+
+        $loginHtml = $this->get(route('login'))->assertOk()->getContent();
+        $this->assertStringContainsString('class="auth-shell"', $loginHtml);
+        $this->assertStringNotContainsString('>Overview<', $loginHtml);
     }
 
     private function assertCleanUiHtml(string $html, string $uri): void

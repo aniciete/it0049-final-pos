@@ -19,15 +19,20 @@
         const header = document.querySelector('.site-header');
         const toggleBtn = document.querySelector('.nav-menu-toggle');
         const navMenu = document.getElementById('main-nav-menu');
-        if (!header || !toggleBtn || !navMenu) {
+        if (!header) {
             return;
         }
-
-        let currentWide = null;
 
         const syncHeaderHeight = () => {
             document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
         };
+
+        if (!toggleBtn || !navMenu) {
+            syncHeaderHeight();
+            return;
+        }
+
+        let currentWide = null;
 
         const applyMode = (isWide) => {
             syncHeaderHeight();
@@ -466,6 +471,26 @@
         updateSummary(false);
     }
 
+    function initDemoLoginFill() {
+        document.querySelectorAll('[data-fill-demo-login]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const form = btn.closest('form') || document.querySelector('form[action$="/login"]') || document;
+                const loginInput = form.querySelector('#login');
+                const passwordInput = form.querySelector('#password');
+
+                if (loginInput instanceof HTMLInputElement) {
+                    loginInput.value = btn.dataset.demoUser || '';
+                }
+                if (passwordInput instanceof HTMLInputElement) {
+                    passwordInput.value = btn.dataset.demoPass || '';
+                }
+                if (loginInput instanceof HTMLInputElement) {
+                    loginInput.focus();
+                }
+            });
+        });
+    }
+
     initResponsiveNavbar();
     initFlashDismiss();
     initConfirmDialog();
@@ -473,4 +498,5 @@
     initSubmitBusyState();
     initImagePreviews();
     initSalePreview();
+    initDemoLoginFill();
 })();
