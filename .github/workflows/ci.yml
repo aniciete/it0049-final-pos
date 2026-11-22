@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, openssl, pdo_sqlite, gd
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install and build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare testing environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Check code style with Pint
+        run: ./vendor/bin/pint --test
+
+      - name: Run PHPUnit test suite
+        run: php artisan test

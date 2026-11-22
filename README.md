@@ -1,6 +1,17 @@
 # Bright-Market Point-of-Sale (POS) System — Laravel 13
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-final--pos.freehosting.dev-133928?style=flat-square&logo=googlechrome&logoColor=white)](https://final-pos.freehosting.dev)
+[![CI](https://img.shields.io/github/actions/workflow/status/aniciete/it0049-final-pos/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/aniciete/it0049-final-pos/actions/workflows/ci.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/aniciete/it0049-final-pos?style=flat-square&color=133928&label=Updated)](https://github.com/aniciete/it0049-final-pos/commits/main)
+[![Laravel 13](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](composer.json)
+[![Database](https://img.shields.io/badge/Database-SQLite%20%7C%20MySQL-005C84?style=flat-square&logo=mysql&logoColor=white)](database/pos_final.sql)
+[![Vite 8](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)](package.json)
+[![Code Style](https://img.shields.io/badge/Code_Style-Laravel_Pint-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com/docs/pint)
+
 **Course:** IT0049 — Web System Technologies  
+**Repository:** [github.com/aniciete/it0049-final-pos](https://github.com/aniciete/it0049-final-pos)  
+**Live Deployment:** [final-pos.freehosting.dev](https://final-pos.freehosting.dev)  
 **Framework:** Laravel 13 (PHP 8.3+)  
 **Authentication:** Laravel Breeze + `auth` middleware  
 **Image Processing & Storage:** Intervention Image (`intervention/image-laravel`) on `Storage::disk('public')`  
