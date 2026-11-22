@@ -87,8 +87,15 @@ class PosLayoutTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
+            ->assertSee('hero-counter.jpg', false)
+            ->assertSee('fetchpriority="high"', false)
             ->assertDontSee('$12.34')
             ->assertDontSee('gross');
+
+        $this->actingAs($staff)
+            ->get(route('home'))
+            ->assertOk()
+            ->assertDontSee('hero-counter.jpg');
     }
 
     public function test_guest_navigation_hides_internal_routes_and_auth_renders_auth_shell(): void

@@ -108,3 +108,9 @@ Build and upload a lean InfinityFree deployment archive using gitignored `.deplo
 ./build-infinityfree-zip.sh
 ./deploy-infinityfree.sh
 ```
+
+---
+
+## 6. Media Attribution
+
+- Landing hero counter photograph (`public/assets/images/hero-counter.jpg`): adapted from [Barista prepares espresso at coffee shop.jpg](https://commons.wikimedia.org/wiki/File:Barista_prepares_espresso_at_coffee_shop.jpg) by [Shixart1985](https://commons.wikimedia.org/wiki/User:Shixart1985), licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).

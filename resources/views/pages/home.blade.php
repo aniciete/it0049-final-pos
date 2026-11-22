@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="container">
-    <section class="home-hero">
-        <div>
+    <section class="home-hero @guest home-hero-guest @endguest">
+        <div class="home-hero-copy">
             <h1 class="hero-title">Counter checkout and live store inventory</h1>
             <p class="page-lead">
                 Record counter sales with stock protection, manage products and accounts, and audit every receipt.
@@ -20,6 +20,19 @@
                     <a href="{{ route('about') }}" class="button button-secondary">About</a>
                 @endauth
             </div>
+
+            @guest
+                <figure class="home-hero-media">
+                    <img
+                        src="{{ asset('assets/images/hero-counter.jpg') }}"
+                        alt="Barista preparing espresso behind an artisan counter"
+                        width="1200"
+                        height="800"
+                        fetchpriority="high"
+                        decoding="async"
+                    >
+                </figure>
+            @endguest
         </div>
 
         @auth
