@@ -112,6 +112,7 @@ if (file_exists(__DIR__.'/index2.html')) {
 $storageDirs = [
     __DIR__.'/storage/app/public/avatars',
     __DIR__.'/storage/app/public/products',
+    __DIR__.'/storage/app/public/products/thumbs',
     __DIR__.'/storage/framework/cache/data',
     __DIR__.'/storage/framework/sessions',
     __DIR__.'/storage/framework/views',

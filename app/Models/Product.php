@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ImageUploadService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -76,6 +77,26 @@ class Product extends Model
             return is_file(public_path('storage/'.$this->image))
                 ? '/storage/'.ltrim($this->image, '/')
                 : route('media.show', ['folder' => 'products', 'filename' => basename($this->image)], false);
+        }
+
+        return '/assets/images/product-placeholder.svg';
+    }
+
+    /**
+     * Resolve the lightweight 96x96 thumbnail URL for catalog tables and SKU tiles.
+     */
+    public function thumbUrl(): string
+    {
+        if ($this->hasImage()) {
+            $thumbPath = ImageUploadService::thumbnailRelativePath($this->image);
+
+            if ($thumbPath !== null && Storage::disk('public')->exists($thumbPath)) {
+                return is_file(public_path('storage/'.$thumbPath))
+                    ? '/storage/'.ltrim($thumbPath, '/')
+                    : route('media.thumb', ['folder' => 'products', 'filename' => basename($this->image)], false);
+            }
+
+            return $this->imageUrl();
         }
 
         return '/assets/images/product-placeholder.svg';

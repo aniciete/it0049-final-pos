@@ -67,6 +67,7 @@ fi
 
 mkdir -p "$TMP_DIR/storage/app/public/avatars" \
          "$TMP_DIR/storage/app/public/products" \
+         "$TMP_DIR/storage/app/public/products/thumbs" \
          "$TMP_DIR/storage/framework/cache/data" \
          "$TMP_DIR/storage/framework/sessions" \
          "$TMP_DIR/storage/framework/views" \

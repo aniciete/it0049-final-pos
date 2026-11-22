@@ -86,6 +86,12 @@ class ProductSeeder extends Seeder
 
             if (is_file($sourceFile)) {
                 Storage::disk('public')->put($relativePath, (string) file_get_contents($sourceFile));
+
+                $thumbRel = 'products/thumbs/'.basename($relativePath);
+                $thumbSource = database_path('seeders/media/'.$thumbRel);
+                if (is_file($thumbSource)) {
+                    Storage::disk('public')->put($thumbRel, (string) file_get_contents($thumbSource));
+                }
             } else {
                 $attributes['image'] = null;
             }

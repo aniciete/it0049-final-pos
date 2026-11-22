@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use App\Services\ImageUploadService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -38,10 +39,17 @@ class PosProductTest extends TestCase
         $this->assertStringStartsWith('products/', $product->image);
 
         Storage::disk('public')->assertExists($product->image);
+        $thumbPath = ImageUploadService::thumbnailRelativePath($product->image);
+        $this->assertNotNull($thumbPath);
+        Storage::disk('public')->assertExists($thumbPath);
 
         $decoded = Image::decode(Storage::disk('public')->get($product->image));
         $this->assertSame(640, $decoded->width());
         $this->assertSame(640, $decoded->height());
+
+        $decodedThumb = Image::decode(Storage::disk('public')->get($thumbPath));
+        $this->assertSame(96, $decodedThumb->width());
+        $this->assertSame(96, $decodedThumb->height());
 
         $this->actingAs($staff)
             ->get(route('products.index'))
@@ -49,9 +57,17 @@ class PosProductTest extends TestCase
             ->assertSee('Matcha Oat Latte')
             ->assertSee(basename($product->image));
 
-        $this->actingAs($staff)
-            ->get(route('media.show', ['folder' => 'products', 'filename' => basename($product->image)]))
+        $mediaResponse = $this->actingAs($staff)
+            ->get(route('media.thumb', ['folder' => 'products', 'filename' => basename($product->image)]))
             ->assertOk();
+        $etag = $mediaResponse->headers->get('ETag');
+        $this->assertNotEmpty($etag);
+        $this->assertStringContainsString('max-age=', (string) $mediaResponse->headers->get('Cache-Control'));
+
+        $this->actingAs($staff)
+            ->withHeaders(['If-None-Match' => $etag])
+            ->get(route('media.thumb', ['folder' => 'products', 'filename' => basename($product->image)]))
+            ->assertStatus(304);
     }
 
     public function test_product_validation_rejects_invalid_image_and_retains_old_input(): void
@@ -104,7 +120,9 @@ class PosProductTest extends TestCase
         $product->refresh();
         $this->assertNotSame($firstPath, $product->image);
         Storage::disk('public')->assertMissing($firstPath);
+        Storage::disk('public')->assertMissing(ImageUploadService::thumbnailRelativePath($firstPath));
         Storage::disk('public')->assertExists($product->image);
+        Storage::disk('public')->assertExists(ImageUploadService::thumbnailRelativePath($product->image));
     }
 
     public function test_products_can_be_archived_restored_and_guarded_against_purge_when_sold(): void

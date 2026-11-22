@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -36,14 +37,38 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Serve uploaded product images & avatars from Storage::disk('public') when public/storage symlink is unavailable
-    Route::get('/media/{folder}/{filename}', function (string $folder, string $filename) {
-        $safeName = basename($filename);
-        $path = $folder.'/'.$safeName;
+    // Serve uploaded product images & avatars from Storage::disk('public') with browser caching
+    $serveMedia = function (Request $request, string $path) {
+        $disk = Storage::disk('public');
+        abort_unless($disk->exists($path), 404);
 
-        abort_unless(Storage::disk('public')->exists($path), 404);
+        $fullPath = $disk->path($path);
+        $mtime = @filemtime($fullPath) ?: time();
+        $size = @filesize($fullPath) ?: 0;
+        $etag = '"'.md5($path.'|'.$mtime.'|'.$size).'"';
 
-        return Storage::disk('public')->response($path);
+        $response = response()->file($fullPath, [
+            'Cache-Control' => 'private, max-age=2592000, immutable',
+            'ETag' => $etag,
+        ]);
+        $response->setLastModified(DateTimeImmutable::createFromFormat('U', (string) $mtime) ?: null);
+
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        return $response;
+    };
+
+    Route::get('/media/{folder}/thumbs/{filename}', function (Request $request, string $folder, string $filename) use ($serveMedia) {
+        return $serveMedia($request, $folder.'/thumbs/'.basename($filename));
+    })
+        ->whereIn('folder', ['products'])
+        ->where('filename', '[A-Za-z0-9._-]+')
+        ->name('media.thumb');
+
+    Route::get('/media/{folder}/{filename}', function (Request $request, string $folder, string $filename) use ($serveMedia) {
+        return $serveMedia($request, $folder.'/'.basename($filename));
     })
         ->whereIn('folder', ['avatars', 'products'])
         ->where('filename', '[A-Za-z0-9._-]+')
