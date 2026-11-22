@@ -12,5 +12,5 @@
 @elseif ($stockQty <= \App\Models\Product::LOW_STOCK_THRESHOLD)
     <span class="status-pill status-low"><span class="mono-num">{{ $stockQty }}</span>&nbsp;low stock</span>
 @else
-    <span class="mono-num">{{ $stockQty }}</span> <span class="cell-muted">{{ $okSuffix }}</span>
+    <span class="stock-readout"><span class="mono-num">{{ $stockQty }}</span> <span class="cell-muted">{{ $okSuffix }}</span></span>
 @endif

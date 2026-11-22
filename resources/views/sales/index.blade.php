@@ -95,8 +95,8 @@
     </form>
 
     @if ($staffFilterUser || $customerFilterRecord)
-        <div class="filter-bar" style="margin-top: calc(var(--space-2) * -1);">
-            <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;">
+        <div class="filter-bar filter-pill-bar">
+            <div class="filter-pill-row">
                 @if ($staffFilterUser)
                     <span class="status-pill status-neutral">
                         Cashier: {{ $staffFilterUser->full_name }}

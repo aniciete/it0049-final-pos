@@ -15,7 +15,7 @@
             </div>
         </div>
     @else
-        <p class="page-lead" style="font-size: var(--text-sm); margin-bottom: var(--space-4);">
+        <p class="profile-delete-lead">
             Enter your current password to permanently delete your own account. Accounts with recorded sales cannot be removed.
         </p>
 

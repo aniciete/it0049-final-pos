@@ -9,7 +9,7 @@
 ])
 
 <aside class="context-panel" aria-label="{{ $title }}">
-    <div class="section-header-row" style="margin-bottom: var(--space-3);">
+    <div class="section-header-row">
         <h2 class="context-panel-title">{{ $title }}</h2>
         @if ($filterUrl)
             <a href="{{ $filterUrl }}" class="table-link context-panel-action">View in Sales History</a>

@@ -25,9 +25,9 @@
                 @csrf
 
                 <div class="form-grid">
-                    <div class="form-group" style="margin-bottom: 0;">
+                    <div class="form-group sku-picker-group">
                         <div class="sku-picker-header">
-                            <label for="sku-picker-search" class="form-label">Product</label>
+                            <span class="form-label">Product</span>
                             @if ($products->isNotEmpty())
                                 <div class="input-with-leading-icon sku-search-box">
                                     <x-icon name="search" :size="15" class="input-leading-icon" />
@@ -36,6 +36,7 @@
                                         id="sku-picker-search"
                                         class="form-control form-control-sm"
                                         placeholder="Filter products..."
+                                        aria-label="Filter products"
                                         autocomplete="off"
                                     >
                                 </div>
@@ -109,7 +110,7 @@
                     </div>
 
                     <div class="register-controls-row">
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group">
                             <label for="sale-customer" class="form-label">Customer</label>
                             <select
                                 id="sale-customer"
@@ -136,7 +137,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group">
                             <label for="sale-quantity" class="form-label">Quantity</label>
                             <div class="qty-stepper-wrap">
                                 <button
@@ -220,7 +221,7 @@
                 <span id="preview-order-total" class="receipt-total-amount mono-num">$0.00</span>
             </div>
 
-            <div style="margin-top: var(--space-4);">
+            <div class="receipt-submit-wrap">
                 <button
                     type="submit"
                     id="complete-sale-btn"

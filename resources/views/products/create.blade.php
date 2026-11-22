@@ -50,7 +50,11 @@
                         <span id="product-preview-card-price" class="mono-num">
                             ${{ number_format((float) (old('price') ?: 0), 2) }}
                         </span>
-                        <span id="product-preview-card-stock" class="status-pill status-out">
+                        <span
+                            id="product-preview-card-stock"
+                            class="status-pill status-out"
+                            data-low-stock-threshold="{{ \App\Models\Product::LOW_STOCK_THRESHOLD }}"
+                        >
                             Out of stock
                         </span>
                     </div>

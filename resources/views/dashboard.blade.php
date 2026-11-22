@@ -47,7 +47,7 @@
         </a>
     </div>
 
-    <section style="margin-top: var(--space-6);" aria-labelledby="recent-sales-heading">
+    <section class="dashboard-recent-section" aria-labelledby="recent-sales-heading">
         <div class="section-header-row">
             <h2 id="recent-sales-heading" class="section-title">Recent Transactions</h2>
             <a href="{{ route('sales.index') }}" class="table-link">Sales History</a>

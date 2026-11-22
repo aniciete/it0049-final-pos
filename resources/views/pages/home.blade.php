@@ -49,7 +49,7 @@
             <div class="auth-card home-signin-card" aria-label="Staff Sign In">
                 <header class="auth-header">
                     <h2 class="context-panel-title">Staff Sign In</h2>
-                    <p class="context-panel-sub" style="margin-bottom: 0;">Open the counter register and store ledgers.</p>
+                    <p class="context-panel-sub home-signin-sub">Open the counter register and store ledgers.</p>
                 </header>
 
                 @include('auth._login_form', ['idPrefix' => 'home', 'autofocus' => false, 'showSummary' => false])

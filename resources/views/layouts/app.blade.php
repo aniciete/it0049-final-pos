@@ -69,7 +69,7 @@
                         </li>
                         @auth
                             <li class="nav-item nav-item-mobile-only">
-                                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                                <form action="{{ route('logout') }}" method="POST" class="mobile-logout-form">
                                     @csrf
                                     <button type="submit" class="nav-link nav-logout-btn">
                                         <x-icon name="sign-out" :size="15" />

@@ -53,7 +53,7 @@
         @endif
     </div>
 
-    <div class="form-actions" style="margin-top: var(--space-4);">
+    <div class="form-actions form-actions-compact">
         <button type="submit" class="button button-primary button-block" data-busy-text="Signing in...">
             <x-icon name="sign-in" :size="15" />
             <span>Sign In</span>

@@ -36,7 +36,7 @@
                     >
                     <div>
                         <h2 class="section-title">{{ $user->full_name }}</h2>
-                        <p class="section-meta" style="margin-top: 0.25rem;">
+                        <p class="section-meta profile-role-meta">
                             <span class="status-pill status-neutral">{{ $user->role }}</span>
                         </p>
                     </div>

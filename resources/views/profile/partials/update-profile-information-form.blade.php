@@ -32,7 +32,7 @@
         @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
             <p class="form-meta-note">
                 Your email address is unverified.
-                <button form="send-verification" class="table-link" style="background:none;border:0;cursor:pointer;padding:0;">
+                <button form="send-verification" class="table-link button-link-inline">
                     Click here to re-send the verification email.
                 </button>
             </p>

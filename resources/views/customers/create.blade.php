@@ -42,7 +42,7 @@
                         <li class="context-list-item">
                             <a href="{{ route('customers.show', $recent) }}" class="context-list-link">
                                 <span class="context-list-top">
-                                    <span style="font-weight: 700;">{{ $recent->full_name }}</span>
+                                    <span class="context-action-label">{{ $recent->full_name }}</span>
                                     <x-icon name="caret-right" :size="14" class="context-chevron" />
                                 </span>
                                 <span class="context-list-bottom">

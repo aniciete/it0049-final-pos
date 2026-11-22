@@ -89,7 +89,7 @@
                     <li class="context-list-item">
                         <a href="{{ route('products.show', $sale->product_id) }}" class="context-list-link">
                             <span class="context-list-top">
-                                <span style="font-weight: 700;">View Product</span>
+                                <span class="context-action-label">View Product</span>
                                 <x-icon name="caret-right" :size="14" class="context-chevron" />
                             </span>
                             <span class="context-list-bottom">
@@ -106,7 +106,7 @@
                     <li class="context-list-item">
                         <a href="{{ route('customers.show', $sale->customer) }}" class="context-list-link">
                             <span class="context-list-top">
-                                <span style="font-weight: 700;">View Customer</span>
+                                <span class="context-action-label">View Customer</span>
                                 <x-icon name="caret-right" :size="14" class="context-chevron" />
                             </span>
                             <span class="context-list-bottom">
@@ -120,7 +120,7 @@
                     <li class="context-list-item">
                         <a href="{{ route('sales.index', ['staff' => $sale->seller->id]) }}" class="context-list-link">
                             <span class="context-list-top">
-                                <span style="font-weight: 700;">Cashier Sales History</span>
+                                <span class="context-action-label">Cashier Sales History</span>
                                 <x-icon name="caret-right" :size="14" class="context-chevron" />
                             </span>
                             <span class="context-list-bottom">
@@ -133,7 +133,7 @@
                 <li class="context-list-item">
                     <a href="{{ route('sales.create') }}" class="context-list-link">
                         <span class="context-list-top">
-                            <span style="font-weight: 700;">Record Another Sale</span>
+                            <span class="context-action-label">Record Another Sale</span>
                             <x-icon name="caret-right" :size="14" class="context-chevron" />
                         </span>
                         <span class="context-list-bottom">

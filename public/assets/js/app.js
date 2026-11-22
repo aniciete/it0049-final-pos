@@ -551,7 +551,13 @@
             }
 
             const isInvalid = oversell || (rawTrimmed !== '' && invalidNumber);
-            qtyInput.setAttribute('aria-invalid', (isInvalid || serverInvalidQty) ? 'true' : 'false');
+            const hasQtyIssue = isInvalid || serverInvalidQty;
+            qtyInput.setAttribute('aria-invalid', hasQtyIssue ? 'true' : 'false');
+            if (hasQtyIssue && qtyErrorEl) {
+                qtyInput.setAttribute('aria-describedby', qtyErrorEl.id);
+            } else {
+                qtyInput.removeAttribute('aria-describedby');
+            }
 
             if (decBtn instanceof HTMLButtonElement) {
                 decBtn.disabled = !isWholePositive || validQty <= 1;
@@ -634,10 +640,11 @@
 
             const stockVal = parseInt(stockInput.value, 10);
             const qty = Number.isFinite(stockVal) ? Math.max(0, stockVal) : 0;
+            const lowThreshold = parseInt(stockOut.dataset.lowStockThreshold || '5', 10);
             if (qty <= 0) {
                 stockOut.className = 'status-pill status-out';
                 stockOut.textContent = 'Out of stock';
-            } else if (qty <= 5) {
+            } else if (qty <= lowThreshold) {
                 stockOut.className = 'status-pill status-low';
                 stockOut.textContent = `${qty} low stock`;
             } else {

@@ -61,7 +61,7 @@
     @enderror
 
     @if ($isEdit && $hasMedia && $removeName)
-        <label for="{{ $removeName }}" class="checkbox-inline" style="margin-top: var(--space-2);">
+        <label for="{{ $removeName }}" class="checkbox-inline media-remove-toggle">
             <input id="{{ $removeName }}" type="checkbox" name="{{ $removeName }}" value="1" class="checkbox-input" {{ old($removeName) ? 'checked' : '' }}>
             <span>{{ $removeLabel }}</span>
         </label>
