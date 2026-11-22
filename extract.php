@@ -23,6 +23,30 @@ if ($expected === '' || ! hash_equals($expected, $provided)) {
 
 $zipFile = __DIR__.'/it0049-final-pos-infinityfree.zip';
 
+$partFiles = glob(__DIR__.'/deploy_part_*') ?: [];
+if ($partFiles !== []) {
+    sort($partFiles, SORT_STRING);
+    $out = fopen($zipFile, 'wb');
+    if ($out === false) {
+        http_response_code(500);
+        echo "ERROR: Unable to assemble deployment archive.\n";
+        exit(1);
+    }
+    foreach ($partFiles as $part) {
+        $in = fopen($part, 'rb');
+        if ($in === false) {
+            fclose($out);
+            http_response_code(500);
+            echo "ERROR: Unable to read chunk {$part}.\n";
+            exit(1);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        @unlink($part);
+    }
+    fclose($out);
+}
+
 if (! file_exists($zipFile)) {
     http_response_code(404);
     echo 'ERROR: Deployment package not found at '.$zipFile."\n";

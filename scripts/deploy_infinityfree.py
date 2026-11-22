@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 Automated FTPS Deployment for Bright-Market Laravel POS to InfinityFree.
-Reads credentials from environment variables or gitignored .deploy.env / .env.production,
-builds the lean zip, and uploads it0049-final-pos-infinityfree.zip, extract.php, and a
-one-time .extract_token over FTPS using curl (TLS 1.3 session reuse + generous timeout).
+Splits the lean production zip into <= 3 MB chunks to stay safely below shared-host
+FTP file-size/timeout limits, then uploads .htaccess, .extract_token, chunks, and extract.php.
 """
 
 import os
@@ -19,6 +18,7 @@ ZIP_PATH = BASE_DIR / "it0049-final-pos-infinityfree.zip"
 EXTRACT_PHP = BASE_DIR / "extract.php"
 DEPLOY_ENV = BASE_DIR / ".deploy.env"
 ENV_PROD = BASE_DIR / ".env.production"
+CHUNK_SIZE_BYTES = 3 * 1024 * 1024  # 3 MB chunks
 
 
 def parse_dotenv(path: Path) -> dict[str, str]:
@@ -75,7 +75,7 @@ def curl_upload(creds: dict[str, str], local_file: Path, remote_name: str) -> No
             "--ssl-reqd",
             "--ftp-pasv",
             "--max-time",
-            "600",
+            "180",
             "--config",
             "-",
             "-T",
@@ -101,11 +101,11 @@ def deploy() -> None:
 
     token = secrets.token_urlsafe(24)
 
-    with tempfile.NamedTemporaryFile("w", encoding="ascii", delete=False) as tmp:
-        tmp.write(token)
-        token_tmp_path = Path(tmp.name)
+    with tempfile.TemporaryDirectory() as tmpdir_str:
+        tmpdir = Path(tmpdir_str)
+        token_tmp_path = tmpdir / ".extract_token"
+        token_tmp_path.write_text(token, encoding="ascii")
 
-    try:
         htaccess_path = BASE_DIR / ".htaccess"
         if htaccess_path.exists():
             print("==> Uploading .htaccess ...")
@@ -114,14 +114,25 @@ def deploy() -> None:
         print("==> Uploading one-time .extract_token ...")
         curl_upload(creds, token_tmp_path, ".extract_token")
 
-        size_mb = ZIP_PATH.stat().st_size / (1024 * 1024)
-        print(f"==> Uploading {ZIP_PATH.name} ({size_mb:.2f} MB) via FTPS ...")
-        curl_upload(creds, ZIP_PATH, ZIP_PATH.name)
+        total_bytes = ZIP_PATH.stat().st_size
+        size_mb = total_bytes / (1024 * 1024)
+        print(f"==> Splitting {ZIP_PATH.name} ({size_mb:.2f} MB) into 3 MB FTPS chunks ...")
+
+        with ZIP_PATH.open("rb") as src:
+            idx = 0
+            while True:
+                data = src.read(CHUNK_SIZE_BYTES)
+                if not data:
+                    break
+                part_name = f"deploy_part_{idx:02d}"
+                part_path = tmpdir / part_name
+                part_path.write_bytes(data)
+                print(f"==> Uploading {part_name} ({len(data) / (1024 * 1024):.2f} MB) ...")
+                curl_upload(creds, part_path, part_name)
+                idx += 1
 
         print("==> Uploading extract.php ...")
         curl_upload(creds, EXTRACT_PHP, "extract.php")
-    finally:
-        token_tmp_path.unlink(missing_ok=True)
 
     app_url = creds["APP_URL"]
     print("\n========================================================")
