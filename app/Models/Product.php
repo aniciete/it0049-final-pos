@@ -74,9 +74,7 @@ class Product extends Model
     public function imageUrl(): string
     {
         if ($this->hasImage()) {
-            return is_file(public_path('storage/'.$this->image))
-                ? '/storage/'.ltrim($this->image, '/')
-                : route('media.show', ['folder' => 'products', 'filename' => basename($this->image)], false);
+            return $this->resolvePublicMediaUrl($this->image, 'media.show');
         }
 
         return '/assets/images/product-placeholder.svg';
@@ -91,15 +89,23 @@ class Product extends Model
             $thumbPath = ImageUploadService::thumbnailRelativePath($this->image);
 
             if ($thumbPath !== null && Storage::disk('public')->exists($thumbPath)) {
-                return is_file(public_path('storage/'.$thumbPath))
-                    ? '/storage/'.ltrim($thumbPath, '/')
-                    : route('media.thumb', ['folder' => 'products', 'filename' => basename($this->image)], false);
+                return $this->resolvePublicMediaUrl($thumbPath, 'media.thumb');
             }
 
             return $this->imageUrl();
         }
 
         return '/assets/images/product-placeholder.svg';
+    }
+
+    /**
+     * Resolve a storage asset URL via public/storage symlink when present or the media route.
+     */
+    private function resolvePublicMediaUrl(string $relativePath, string $routeName): string
+    {
+        return is_file(public_path('storage/'.$relativePath))
+            ? '/storage/'.ltrim($relativePath, '/')
+            : route($routeName, ['folder' => 'products', 'filename' => basename($relativePath)], false);
     }
 
     /**

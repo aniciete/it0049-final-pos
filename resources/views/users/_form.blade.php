@@ -131,12 +131,10 @@
     </div>
 
     <aside class="context-panel" aria-label="Staff Photo">
-        <h2 class="context-panel-title" style="margin-bottom: var(--space-3);">Staff Photo</h2>
-
         <x-media-picker
             field-id="user-avatar"
             input-name="avatar"
-            label="Photo"
+            label="Staff Photo"
             preview-id="user-avatar-preview"
             status-id="user-avatar-status"
             :default-src="$user->avatarUrl()"
@@ -144,7 +142,7 @@
             :has-media="$user->hasAvatar()"
             help-text="Optional. JPG, PNG, or WebP up to 2 MB. Cropped to 256×256 on save."
             remove-name="remove_avatar"
-            remove-label="Remove current photo on save"
+            remove-label="Remove current staff photo on save"
             error-id="user_avatar_error"
             :is-edit="$isEdit"
         />

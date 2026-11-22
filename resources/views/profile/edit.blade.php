@@ -43,11 +43,11 @@
                 </div>
 
                 <div class="detail-attr-grid">
-                    <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                    <div class="detail-attr-item">
                         <span class="detail-attr-label">Username</span>
                         <span class="detail-attr-value mono-num">{{ $user->username }}</span>
                     </div>
-                    <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                    <div class="detail-attr-item">
                         <span class="detail-attr-label">Recorded Sales</span>
                         <span class="detail-attr-value mono-num">
                             <x-sales-count-link :count="$salesCount" :url="route('sales.index', ['staff' => $user->id])" />

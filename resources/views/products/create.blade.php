@@ -32,7 +32,7 @@
         </div>
 
         <aside class="context-panel" aria-label="Catalog Preview">
-            <h2 class="context-panel-title" style="margin-bottom: var(--space-3);">Catalog Preview</h2>
+            <h2 class="context-panel-title">Catalog Preview</h2>
 
             <div class="product-preview-card">
                 <img

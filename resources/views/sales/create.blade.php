@@ -46,6 +46,9 @@
                             id="sale-product"
                             name="product_id"
                             class="form-control sku-native-select"
+                            aria-label="Product"
+                            tabindex="-1"
+                            aria-hidden="true"
                             required
                             aria-invalid="{{ $errors->has('product_id') ? 'true' : 'false' }}"
                             @error('product_id') aria-describedby="sale_product_error" @enderror

@@ -31,6 +31,7 @@ Bright-Market POS is a full-stack Point-of-Sale and Inventory Management applica
 | `/sales/{sale}` | `GET` | `SaleController@show` | `auth` | Single transaction receipt breakdown view |
 | `/profile` | `GET/PATCH/DELETE` | `ProfileController` | `auth` | Personal profile and password management |
 | `/media/{folder}/{filename}` | `GET` | Closure (`Storage::disk('public')`) | `auth` | Serves stored `avatars` and `products` images when symlink is unavailable |
+| `/media/{folder}/thumbs/{filename}` | `GET` | Closure (`Storage::disk('public')`) | `auth` | Serves cached 96&times;96 product list thumbnails |
 
 ---
 

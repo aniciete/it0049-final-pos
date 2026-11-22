@@ -57,7 +57,7 @@
             </div>
 
             <div class="detail-attr-grid receipt-meta-grid">
-                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                <div class="detail-attr-item">
                     <span class="detail-attr-label">Customer</span>
                     <span class="detail-attr-value">
                         @if ($sale->customer)
@@ -68,7 +68,7 @@
                         @endif
                     </span>
                 </div>
-                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                <div class="detail-attr-item">
                     <span class="detail-attr-label">Cashier</span>
                     <span class="detail-attr-value">
                         @if ($sale->seller)
@@ -83,7 +83,7 @@
         </section>
 
         <aside class="context-panel no-print" aria-label="Receipt Actions">
-            <h2 class="context-panel-title" style="margin-bottom: var(--space-3);">Quick Actions</h2>
+            <h2 class="context-panel-title">Quick Actions</h2>
             <ul class="context-list">
                 @if ($sale->product)
                     <li class="context-list-item">

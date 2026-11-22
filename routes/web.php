@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
         $etag = '"'.md5($path.'|'.$mtime.'|'.$size).'"';
 
         $response = response()->file($fullPath, [
-            'Cache-Control' => 'private, max-age=2592000, immutable',
+            'Cache-Control' => 'private, max-age=86400, must-revalidate',
             'ETag' => $etag,
         ]);
         $response->setLastModified(DateTimeImmutable::createFromFormat('U', (string) $mtime) ?: null);

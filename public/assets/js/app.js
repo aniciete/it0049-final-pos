@@ -540,6 +540,12 @@
                     recoveryBtn.hidden = stock <= 0;
                 }
                 feedbackRow.hidden = false;
+            } else if (rawTrimmed !== '' && invalidNumber && feedbackRow && qtyErrorEl && !serverInvalidQty) {
+                qtyErrorEl.textContent = 'Quantity must be a positive whole number.';
+                if (recoveryBtn) {
+                    recoveryBtn.hidden = true;
+                }
+                feedbackRow.hidden = false;
             } else if (!oversell && !serverInvalidQty && feedbackRow) {
                 feedbackRow.hidden = true;
             }
@@ -554,7 +560,7 @@
                 incBtn.disabled = validQty >= stock;
             }
             if (submitBtn instanceof HTMLButtonElement) {
-                submitBtn.disabled = !isWholePositive || oversell;
+                submitBtn.disabled = serverInvalidQty || !isWholePositive || oversell;
             }
         };
 

@@ -49,7 +49,7 @@
                         <x-sales-count-link :count="$customer->sales_count" :url="route('sales.index', ['customer' => $customer->id])" />
                     </span>
                 </div>
-                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                <div class="detail-attr-item">
                     <span class="detail-attr-label">Added On</span>
                     <span class="detail-attr-value mono-num">{{ $customer->created_at?->format('M j, Y') }}</span>
                 </div>

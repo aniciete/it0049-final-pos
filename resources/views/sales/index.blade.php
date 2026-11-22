@@ -107,7 +107,6 @@
                         Customer: {{ $customerFilterRecord->full_name }}
                     </span>
                 @endif
-                <a href="{{ route('sales.index') }}" class="table-link" style="font-size: var(--text-meta);">Reset filter</a>
             </div>
         </div>
     @endif

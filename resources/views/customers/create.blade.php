@@ -32,7 +32,7 @@
         </div>
 
         <aside class="context-panel" aria-label="Recently Added Customers">
-            <h2 class="context-panel-title" style="margin-bottom: var(--space-3);">Recently Added</h2>
+            <h2 class="context-panel-title">Recently Added</h2>
 
             @if ($recentCustomers->isEmpty())
                 <p class="section-meta">No customers registered yet.</p>

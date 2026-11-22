@@ -122,6 +122,15 @@ class PosLayoutTest extends TestCase
         $loginHtml = $this->get(route('login'))->assertOk()->getContent();
         $this->assertStringContainsString('class="auth-shell"', $loginHtml);
         $this->assertStringNotContainsString('>Overview<', $loginHtml);
+
+        $this->from(route('home'))
+            ->followingRedirects()
+            ->post(route('login'), [
+                'login' => 'nonexistent.user',
+                'password' => 'wrong-password',
+            ])
+            ->assertOk()
+            ->assertSee('home_login_error');
     }
 
     private function assertCleanUiHtml(string $html, string $uri): void
@@ -167,5 +176,24 @@ class PosLayoutTest extends TestCase
 
         $staffShowHtml = $this->actingAs($staff)->get(route('users.show', $staff))->assertOk()->getContent();
         $this->assertStringNotContainsString('Account #', $staffShowHtml);
+
+        foreach ([
+            route('customers.show', Customer::query()->firstOrFail()),
+            route('products.show', Product::query()->firstOrFail()),
+            route('users.show', $staff),
+        ] as $detailUri) {
+            $detailHtml = $this->actingAs($staff)->get($detailUri)->assertOk()->getContent();
+            if (preg_match_all('/class="context-list-bottom">(.*?)<\/span>\s*<\/a>/s', $detailHtml, $matches)) {
+                foreach ($matches[1] as $bottomMeta) {
+                    $dotCount = substr_count($bottomMeta, '&middot;') + substr_count($bottomMeta, "\u{00B7}");
+                    $this->assertLessThanOrEqual(1, $dotCount, "Too many middle dots on {$detailUri}");
+                }
+            }
+        }
+
+        $salesHtml = $this->actingAs($staff)->get(route('sales.index'))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/<label[^>]*for="sales-from"[^>]*>From<\/label>/', $salesHtml);
+        $this->assertMatchesRegularExpression('/<label[^>]*for="sales-to"[^>]*>To<\/label>/', $salesHtml);
+        $this->assertStringContainsString('>Apply<', $salesHtml);
     }
 }

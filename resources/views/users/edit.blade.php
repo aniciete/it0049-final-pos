@@ -12,7 +12,7 @@
     <header class="directory-header">
         <div>
             <h1 class="page-title">Edit Staff: {{ $user->full_name }}</h1>
-            <p class="page-lead">Update operator details, set a new password, or replace the photo.</p>
+            <p class="page-lead">Update operator details, set a new password, or replace the staff photo.</p>
         </div>
     </header>
 

@@ -49,12 +49,22 @@ class PosSalesTransactionTest extends TestCase
         $this->assertSame('43.50', $sale->total_price);
 
         $this->actingAs($staff)
+            ->withSession([
+                'success' => "Sale #{$sale->id} recorded: 3× Roasted Arabica Beans (\$43.50). Remaining stock: 6.",
+                'success_link' => [
+                    'url' => route('sales.show', $sale),
+                    'label' => "View Receipt #{$sale->id}",
+                ],
+                'highlight_sale_id' => $sale->id,
+            ])
             ->get(route('sales.index'))
             ->assertOk()
             ->assertSee('Roasted Arabica Beans')
             ->assertSee('Teresa Mendoza')
             ->assertSee('Daniel Valdez')
             ->assertSee('$43.50')
+            ->assertSee("View Receipt #{$sale->id}")
+            ->assertSee('row-just-created')
             ->assertSee('Search Ledger')
             ->assertSee('From')
             ->assertSee('To')

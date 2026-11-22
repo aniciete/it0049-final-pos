@@ -54,11 +54,11 @@
                         <x-sales-count-link :count="$user->sales_count" :url="route('sales.index', ['staff' => $user->id])" />
                     </span>
                 </div>
-                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                <div class="detail-attr-item">
                     <span class="detail-attr-label">Member Since</span>
                     <span class="detail-attr-value mono-num">{{ $user->created_at?->format('M j, Y') }}</span>
                 </div>
-                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                <div class="detail-attr-item">
                     <span class="detail-attr-label">Session Status</span>
                     <span class="detail-attr-value">{{ $user->is(Auth::user()) ? 'Current Session' : 'Staff operator' }}</span>
                 </div>
