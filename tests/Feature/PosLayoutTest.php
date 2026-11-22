@@ -106,6 +106,19 @@ class PosLayoutTest extends TestCase
             $this->assertStringNotContainsString(route('dashboard'), $headerHtml);
         }
 
+        $homeHtml = $this->get(route('home'))->assertOk()->getContent();
+        $this->assertStringNotContainsString('Counter Terminal Ready', $homeHtml);
+        $this->assertStringNotContainsString('Oversell guard active', $homeHtml);
+        $this->assertStringNotContainsString('Open Catalog', $homeHtml);
+
+        $aboutHtml = $this->get(route('about'))->assertOk()->getContent();
+        $this->assertStringNotContainsString('deleted_at', $aboutHtml);
+        $this->assertStringNotContainsString('stock_quantity', $aboutHtml);
+        $this->assertStringNotContainsString('sold_by', $aboutHtml);
+        $this->assertStringNotContainsString('System Overview', $aboutHtml);
+        $this->assertStringContainsString('How Counter Data Connects', $aboutHtml);
+        $this->assertStringContainsString('Sales Ledger', $aboutHtml);
+
         $loginHtml = $this->get(route('login'))->assertOk()->getContent();
         $this->assertStringContainsString('class="auth-shell"', $loginHtml);
         $this->assertStringNotContainsString('>Overview<', $loginHtml);

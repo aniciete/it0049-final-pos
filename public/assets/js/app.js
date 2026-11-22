@@ -474,9 +474,9 @@
     function initDemoLoginFill() {
         document.querySelectorAll('[data-fill-demo-login]').forEach((btn) => {
             btn.addEventListener('click', () => {
-                const form = btn.closest('form') || document.querySelector('form[action$="/login"]') || document;
-                const loginInput = form.querySelector('#login');
-                const passwordInput = form.querySelector('#password');
+                const container = btn.closest('.auth-card') || document;
+                const loginInput = container.querySelector('input[name="login"]');
+                const passwordInput = container.querySelector('input[name="password"]');
 
                 if (loginInput instanceof HTMLInputElement) {
                     loginInput.value = btn.dataset.demoUser || '';

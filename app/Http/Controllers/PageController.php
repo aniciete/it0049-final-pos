@@ -28,7 +28,7 @@ class PageController extends Controller
     public function about(): View
     {
         return view('pages.about', [
-            'title' => 'System Overview | Bright-Market POS',
+            'title' => 'About | Bright-Market POS',
             'activePage' => 'about',
         ]);
     }
