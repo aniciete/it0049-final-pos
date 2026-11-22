@@ -1,13 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <!-- Warm cream outer ticket base -->
-  <rect width="32" height="32" rx="4" fill="#fff8e8"/>
-  <!-- Deep basil market stamp -->
-  <rect x="2" y="2" width="28" height="28" rx="3" fill="#173c2a"/>
-  <!-- Ticket perforated notched border -->
-  <rect x="4.5" y="4.5" width="23" height="23" rx="2" fill="none" stroke="#fff8e8" stroke-width="1" stroke-dasharray="2 1.5"/>
-  <!-- Central market typography 'P' -->
-  <text x="10" y="22" font-family="-apple-system, BlinkMacSystemFont, 'IBM Plex Mono', monospace" font-size="16" font-weight="900" fill="#fff8e8">P</text>
-  <!-- Tomato red produce pip -->
-  <circle cx="21.5" cy="11.5" r="3.5" fill="#c94c38"/>
-  <circle cx="21.5" cy="11.5" r="1.5" fill="#fff8e8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="32" height="32">
+  <rect width="256" height="256" rx="48" fill="#15402d"/>
+  <g transform="translate(36 36) scale(0.72)">
+    <path d="M239.76,158.06,217.28,68.12A16,16,0,0,0,201.75,56H136V40a16,16,0,0,0-16-16H80A16,16,0,0,0,64,40V56H54.25A16,16,0,0,0,38.72,68.12L16.24,158.06A7.93,7.93,0,0,0,16,160v32a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V160A7.93,7.93,0,0,0,239.76,158.06ZM80,40h40V56H80ZM54.25,72h147.5l20,80H34.25ZM32,192V168H224v24ZM64,96a8,8,0,0,1,8-8H88a8,8,0,0,1,0,16H72A8,8,0,0,1,64,96Zm48,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,96Zm48,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H168A8,8,0,0,1,160,96ZM64,128a8,8,0,0,1,8-8H88a8,8,0,0,1,0,16H72A8,8,0,0,1,64,128Zm48,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,128Zm48,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H168A8,8,0,0,1,160,128Z" fill="#ffffff"/>
+  </g>
 </svg>

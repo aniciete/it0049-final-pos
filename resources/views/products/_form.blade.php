@@ -64,50 +64,21 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="product-image" class="form-label">
-            Product Image <span class="form-label-optional">(Optional — JPG, PNG, WebP up to 2 MB)</span>
-        </label>
-
-        <div class="media-preview-row">
-            <img
-                id="product-image-preview"
-                src="{{ $product->imageUrl() }}"
-                data-default-src="{{ $product->imageUrl() }}"
-                alt="{{ $product->name ?: 'Product' }} preview"
-                class="media-preview-thumb"
-                width="64"
-                height="64"
-            >
-            <div>
-                <p id="product-image-status" class="form-hint" style="font-weight: 700; color: var(--basil);">
-                    {{ $product->hasImage() ? 'Current photo stored on public disk' : 'No custom image uploaded (using placeholder)' }}
-                </p>
-                <p class="form-hint">Images are resized cleanly to 640&times;640 on save.</p>
-            </div>
-        </div>
-
-        <input
-            type="file"
-            id="product-image"
-            name="image"
-            class="form-control"
-            accept="image/jpeg,image/png,image/webp"
-            data-preview-img="product-image-preview"
-            data-preview-status="product-image-status"
-            data-remove-checkbox="remove_image"
-            aria-invalid="{{ $errors->has('image') ? 'true' : 'false' }}"
-            @error('image') aria-describedby="product_image_error" @enderror
-        >
-        @error('image')
-            <p id="product_image_error" class="form-field-error">{{ $message }}</p>
-        @enderror
-
-        @if ($isEdit && $product->hasImage())
-            <label for="remove_image" class="checkbox-inline" style="margin-top: var(--space-1);">
-                <input id="remove_image" type="checkbox" name="remove_image" value="1" class="checkbox-input" {{ old('remove_image') ? 'checked' : '' }}>
-                <span>Remove existing product image on save</span>
-            </label>
-        @endif
-    </div>
+    <x-media-picker
+        field-id="product-image"
+        input-name="image"
+        label="Product Photo"
+        preview-id="product-image-preview"
+        status-id="product-image-status"
+        :default-src="$product->imageUrl()"
+        :alt="($product->name ?: 'Product').' preview'"
+        :has-media="$product->hasImage()"
+        active-status="Current product photo active."
+        empty-status="No custom photo uploaded."
+        help-text="Optional. JPG, PNG, or WebP up to 2 MB, resized cleanly to 640x640."
+        remove-name="remove_image"
+        remove-label="Remove existing product image on save"
+        error-id="product_image_error"
+        :is-edit="$isEdit"
+    />
 </div>

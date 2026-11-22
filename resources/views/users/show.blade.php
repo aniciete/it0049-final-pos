@@ -3,57 +3,74 @@
 @section('content')
 <div class="container">
     <div class="back-link-row">
-        <a href="{{ route('users.index') }}" class="back-link">&larr; Back to Staff</a>
+        <a href="{{ route('users.index') }}" class="back-link">
+            <x-icon name="arrow-left" :size="15" />
+            <span>Back to Staff</span>
+        </a>
     </div>
 
     <header class="directory-header">
-        <div>
-            <p class="eyebrow">Staff Account #{{ $user->id }}</p>
-            <h1 class="page-title">{{ $user->full_name }}</h1>
-            <p class="page-lead">Authenticated POS staff profile and security summary.</p>
-        </div>
-        <div class="directory-header-actions">
-            <a href="{{ route('users.edit', $user) }}" class="button button-primary">Edit Staff User</a>
-        </div>
-    </header>
-
-    <div class="details-card" style="max-width: 680px;">
-        <div class="media-preview-row" style="margin-bottom: var(--space-5);">
+        <div class="cell-product-lockup">
             <img
                 src="{{ $user->avatarUrl() }}"
                 alt="{{ $user->full_name }} avatar"
-                class="media-preview-thumb"
-                width="64"
-                height="64"
+                class="detail-identity-avatar"
+                width="56"
+                height="56"
             >
             <div>
-                <h2 class="section-title">{{ $user->full_name }}</h2>
-                <p class="section-meta">{{ $user->role }}</p>
+                <h1 class="page-title">{{ $user->full_name }}</h1>
+                <p class="page-lead">{{ $user->role }} &middot; Account <span class="mono-num">#{{ $user->id }}</span></p>
             </div>
         </div>
+        <div class="directory-header-actions">
+            <a href="{{ route('users.edit', $user) }}" class="button button-primary">
+                <x-icon name="pencil-simple" :size="15" />
+                <span>Edit Staff</span>
+            </a>
+        </div>
+    </header>
 
-        <ul class="details-list">
-            <li>
-                <strong>Username</strong>
-                <span class="mono-num">{{ $user->username }}</span>
-            </li>
-            <li>
-                <strong>Email Address</strong>
-                <span>{{ $user->email ?: 'Not set' }}</span>
-            </li>
-            <li>
-                <strong>Password Storage</strong>
-                <span class="status-pill status-ok">Bcrypt Hashed</span>
-            </li>
-            <li>
-                <strong>Recorded Sales</strong>
-                <span class="mono-num">{{ $user->sales_count }}</span>
-            </li>
-            <li>
-                <strong>Member Since</strong>
-                <span class="mono-num">{{ $user->created_at?->format('M j, Y H:i') }}</span>
-            </li>
-        </ul>
+    <div class="workspace-split">
+        <section class="details-card" aria-label="Staff profile details">
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Role</span>
+                <span class="detail-kv-value">
+                    <span class="status-pill status-neutral">{{ $user->role }}</span>
+                </span>
+            </div>
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Username</span>
+                <span class="detail-kv-value mono-num">{{ $user->username }}</span>
+            </div>
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Email Address</span>
+                <span class="detail-kv-value">{{ $user->email ?: 'Not set' }}</span>
+            </div>
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Credential Status</span>
+                <span class="detail-kv-value">Password set</span>
+            </div>
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Recorded Sales</span>
+                <span class="detail-kv-value mono-num">
+                    <x-sales-count-link :count="$user->sales_count" :url="route('sales.index', ['staff' => $user->id])" />
+                </span>
+            </div>
+            <div class="detail-kv-row">
+                <span class="detail-kv-label">Member Since</span>
+                <span class="detail-kv-value mono-num">{{ $user->created_at?->format('M j, Y') }}</span>
+            </div>
+        </section>
+
+        <x-recent-sales-panel
+            title="Recent Sales"
+            subtitle="Latest receipts processed by this staff member."
+            :sales="$recentSales"
+            empty-text="No sales recorded by this staff member yet."
+            :show-seller="false"
+            :filter-url="(int) $user->sales_count > 0 ? route('sales.index', ['staff' => $user->id]) : null"
+        />
     </div>
 </div>
 @endsection

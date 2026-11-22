@@ -10,13 +10,14 @@
         <form method="POST" action="{{ route('password.confirm') }}" novalidate>
             @csrf
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <input id="password" type="password" name="password" class="form-control" required autocomplete="current-password">
-                @error('password')
-                    <p class="form-field-error">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-password-input
+                id="password"
+                name="password"
+                label="Password"
+                autocomplete="current-password"
+                :required="true"
+                error-id="confirm_password_error"
+            />
 
             <div class="form-actions">
                 <button type="submit" class="button button-primary">Confirm</button>

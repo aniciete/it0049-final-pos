@@ -17,16 +17,21 @@
         @csrf
         @method('DELETE')
 
-        <div class="form-group">
-            <label for="delete_account_password" class="form-label">Confirm Password</label>
-            <input id="delete_account_password" name="password" type="password" class="form-control" placeholder="Enter your password" required>
-            @if ($errors->userDeletion->has('password'))
-                <p class="form-field-error">{{ $errors->userDeletion->first('password') }}</p>
-            @endif
-        </div>
+        <x-password-input
+            id="delete_account_password"
+            name="password"
+            label="Confirm Password"
+            autocomplete="current-password"
+            :required="true"
+            error-bag="userDeletion"
+            error-id="delete_account_password_error"
+        />
 
         <div class="form-actions">
-            <button type="submit" class="button button-danger">Delete Account</button>
+            <button type="submit" class="button button-danger">
+                <x-icon name="trash" :size="15" />
+                <span>Delete Account</span>
+            </button>
         </div>
     </form>
 </section>

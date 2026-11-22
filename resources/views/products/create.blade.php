@@ -3,22 +3,20 @@
 @section('content')
 <div class="container">
     <div class="back-link-row">
-        <a href="{{ route('products.index') }}" class="back-link">&larr; Back to Products</a>
+        <a href="{{ route('products.index') }}" class="back-link">
+            <x-icon name="arrow-left" :size="15" />
+            <span>Back to Products</span>
+        </a>
     </div>
 
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Inventory Catalog</p>
             <h1 class="page-title">Add Product</h1>
             <p class="page-lead">Create a new retail SKU with pricing, opening stock, and an optional photo.</p>
         </div>
     </header>
 
-    <div class="form-card" style="max-width: 720px;">
-        <div class="form-card-header">
-            <h2 class="form-section-title">Product Details</h2>
-        </div>
-
+    <div class="form-card form-measure">
         @include('partials.error_summary')
 
         <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" novalidate>

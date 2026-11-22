@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Bright-Market POS' }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ preg_replace('~^https?:~', '', asset('favicon.svg')) }}">
-    <link rel="stylesheet" href="{{ preg_replace('~^https?:~', '', asset('assets/css/style.css')) }}">
-    <script src="{{ preg_replace('~^https?:~', '', asset('assets/js/app.js')) }}" defer></script>
+    <link rel="stylesheet" href="{{ preg_replace('~^https?:~', '', asset('assets/css/style.css')) }}?v={{ @filemtime(public_path('assets/css/style.css')) ?: '1' }}">
+    <script src="{{ preg_replace('~^https?:~', '', asset('assets/js/app.js')) }}?v={{ @filemtime(public_path('assets/js/app.js')) ?: '1' }}" defer></script>
 </head>
 <body class="page-{{ $activePage ?? 'home' }}">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -16,18 +16,10 @@
         <div class="container header-container">
             <div class="brand-lockup">
                 <a href="{{ route('home') }}" class="brand-link" aria-label="Bright-Market POS Home">
-                    <svg class="brand-mark" width="32" height="32" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-                        <rect x="2" y="2" width="24" height="24" rx="2" stroke="#173c2a" stroke-width="2" fill="#fff8e8"/>
-                        <rect x="6" y="7" width="16" height="5" fill="#173c2a"/>
-                        <circle cx="9" cy="17" r="1.5" fill="#c94c38"/>
-                        <circle cx="14" cy="17" r="1.5" fill="#173c2a"/>
-                        <circle cx="19" cy="17" r="1.5" fill="#173c2a"/>
-                        <circle cx="9" cy="21" r="1.5" fill="#173c2a"/>
-                        <rect x="12.5" y="19.5" width="8" height="3" rx="0.5" fill="#3b5243"/>
-                    </svg>
+                    <x-application-logo class="brand-mark" width="32" height="32" aria-hidden="true" />
                     <span class="brand-text">
-                        <span class="brand-badge">POS</span>
-                        <span class="brand-title">Terminal</span>
+                        <span class="brand-badge">Bright-Market</span>
+                        <span class="brand-title">POS</span>
                     </span>
                 </a>
             </div>
@@ -41,7 +33,8 @@
                     aria-controls="main-nav-menu"
                     aria-expanded="false"
                 >
-                    Menu
+                    <x-icon name="list" :size="16" />
+                    <span>Menu</span>
                 </button>
                 <ul id="main-nav-menu" class="nav-list">
                     <li class="nav-item">
@@ -70,6 +63,17 @@
                     <li class="nav-item">
                         <a href="{{ route('about') }}" class="nav-link {{ ($activePage ?? '') === 'about' ? 'active' : '' }}" {!! ($activePage ?? '') === 'about' ? 'aria-current="page"' : '' !!}>About</a>
                     </li>
+                    @auth
+                        <li class="nav-item nav-item-mobile-only">
+                            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                                @csrf
+                                <button type="submit" class="nav-link nav-logout-btn">
+                                    <x-icon name="sign-out" :size="15" />
+                                    <span>Log Out</span>
+                                </button>
+                            </form>
+                        </li>
+                    @endauth
                 </ul>
             </nav>
 
@@ -83,18 +87,30 @@
                         <img
                             src="{{ Auth::user()->avatarUrl() }}"
                             alt=""
-                            width="22"
-                            height="22"
+                            width="24"
+                            height="24"
+                            loading="eager"
+                            decoding="sync"
                             class="session-user-avatar"
                         >
                         <span>{{ Auth::user()->username ?: Auth::user()->full_name }}</span>
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="header-logout-form">
                         @csrf
-                        <button type="submit" class="button button-secondary button-sm">Log Out</button>
+                        <button type="submit" class="button button-secondary button-sm">
+                            <x-icon name="sign-out" :size="14" />
+                            <span>Log Out</span>
+                        </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="button button-secondary button-sm {{ request()->routeIs('login') ? 'active' : '' }}">Staff Login</a>
+                    @if (! request()->routeIs('login'))
+                        <a href="{{ route('login') }}" class="button button-secondary button-sm">
+                            <x-icon name="sign-in" :size="14" />
+                            <span>Sign In</span>
+                        </a>
+                    @else
+                        <a href="{{ route('home') }}" class="nav-link">Overview</a>
+                    @endif
                 @endauth
             </div>
         </div>
@@ -116,7 +132,6 @@
         <div class="container footer-container">
             <div class="footer-colophon">
                 <span class="footer-brand">Bright-Market POS</span>
-                <span class="footer-meta">Laravel 13 MVC Point-of-Sale &amp; Inventory Ledger</span>
             </div>
         </div>
     </footer>
@@ -124,7 +139,7 @@
     <dialog id="confirm-action-dialog" class="confirm-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
         <div class="confirm-dialog-body">
             <h2 id="confirm-dialog-title" class="confirm-dialog-title">Confirm Action</h2>
-            <p id="confirm-dialog-message" class="confirm-dialog-message">Confirm this ledger update?</p>
+            <p id="confirm-dialog-message" class="confirm-dialog-message">Confirm this update?</p>
             <div class="confirm-dialog-actions">
                 <button type="button" id="confirm-dialog-cancel" class="button button-secondary">Cancel</button>
                 <button type="button" id="confirm-dialog-submit" class="button button-danger">Confirm</button>

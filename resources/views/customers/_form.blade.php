@@ -37,9 +37,7 @@
         </div>
 
         <div class="form-group">
-            <label for="customer-phone" class="form-label">
-                Phone Number <span class="form-label-optional">(Optional)</span>
-            </label>
+            <label for="customer-phone" class="form-label">Phone Number</label>
             <input
                 type="text"
                 id="customer-phone"
@@ -47,10 +45,10 @@
                 class="form-control mono-num"
                 value="{{ old('phone', $customer->phone) }}"
                 maxlength="20"
-                placeholder="e.g. +63 917 555 0199"
                 aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}"
                 @error('phone') aria-describedby="customer_phone_error" @enderror
             >
+            <p class="form-hint">Optional. Format example: +63 917 555 0199</p>
             @error('phone')
                 <p id="customer_phone_error" class="form-field-error">{{ $message }}</p>
             @enderror

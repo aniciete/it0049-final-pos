@@ -1,10 +1,7 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="256" height="256" rx="28" fill="#F5EEDC"/>
-    <rect x="2" y="2" width="252" height="252" rx="26" stroke="#CADBC7" stroke-width="4"/>
-    <path d="M56 96L128 58L200 96V166L128 202L56 166V96Z" fill="#E2EDE4" stroke="#173C2A" stroke-width="5" stroke-linejoin="round"/>
-    <path d="M56 96L128 134L200 96" stroke="#173C2A" stroke-width="5" stroke-linejoin="round"/>
-    <path d="M128 134V202" stroke="#173C2A" stroke-width="5" stroke-linecap="round"/>
-    <path d="M90 78L162 116" stroke="#3F5947" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="186" cy="176" r="22" fill="#C94C38"/>
-    <path d="M178 176H194M186 168V184" stroke="#FFF8E8" stroke-width="3.5" stroke-linecap="round"/>
+    <rect width="256" height="256" rx="20" fill="#EEF1F4"/>
+    <g transform="translate(56 56) scale(0.5625)" fill="#15402D">
+        <path d="M128,129.09V232a8,8,0,0,1-3.84-1l-88-48.18a8,8,0,0,1-4.16-7V80.18a8,8,0,0,1,.7-3.25Z" opacity="0.18"/>
+        <path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"/>
+    </g>
 </svg>

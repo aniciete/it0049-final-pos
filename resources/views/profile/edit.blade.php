@@ -1,13 +1,15 @@
 <x-app-layout :title="'My Profile | Bright-Market POS'" :activePage="'profile'">
     <div class="back-link-row">
-        <a href="{{ route('dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+        <a href="{{ route('dashboard') }}" class="back-link">
+            <x-icon name="arrow-left" :size="15" />
+            <span>Back to Dashboard</span>
+        </a>
     </div>
 
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Operator Settings</p>
             <h1 class="page-title">Account Profile</h1>
-            <p class="page-lead">Update your staff profile details, email address, or password.</p>
+            <p class="page-lead">Update your personal details, email address, or password.</p>
         </div>
     </header>
 

@@ -19,21 +19,24 @@
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="password" class="form-label">New Password</label>
-                <input id="password" type="password" name="password" class="form-control" required autocomplete="new-password">
-                @error('password')
-                    <p class="form-field-error">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-password-input
+                id="password"
+                name="password"
+                label="New Password"
+                autocomplete="new-password"
+                :required="true"
+                error-id="reset_password_error"
+            />
 
-            <div class="form-group">
-                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
-                @error('password_confirmation')
-                    <p class="form-field-error">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-password-input
+                id="password_confirmation"
+                name="password_confirmation"
+                label="Confirm Password"
+                autocomplete="new-password"
+                :required="true"
+                error-id="reset_password_confirmation_error"
+                toggle-label="Show confirm password"
+            />
 
             <div class="form-actions">
                 <button type="submit" class="button button-primary">Reset Password</button>

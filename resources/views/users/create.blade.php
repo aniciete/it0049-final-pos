@@ -3,22 +3,20 @@
 @section('content')
 <div class="container">
     <div class="back-link-row">
-        <a href="{{ route('users.index') }}" class="back-link">&larr; Back to Staff</a>
+        <a href="{{ route('users.index') }}" class="back-link">
+            <x-icon name="arrow-left" :size="15" />
+            <span>Back to Staff</span>
+        </a>
     </div>
 
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Staff Directory</p>
-            <h1 class="page-title">Add Staff Account</h1>
-            <p class="page-lead">Create a staff login with hashed credentials and an optional avatar.</p>
+            <h1 class="page-title">Add Staff</h1>
+            <p class="page-lead">Create an authenticated POS operator account with role assignment and avatar.</p>
         </div>
     </header>
 
-    <div class="form-card" style="max-width: 760px;">
-        <div class="form-card-header">
-            <h2 class="form-section-title">Staff Account Details</h2>
-        </div>
-
+    <div class="form-card form-measure">
         @include('partials.error_summary')
 
         <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data" novalidate>
@@ -27,7 +25,7 @@
 
             <div class="form-actions">
                 <a href="{{ route('users.index') }}" class="button button-secondary">Cancel</a>
-                <button type="submit" class="button button-primary" data-busy-text="Creating account...">Create Staff User</button>
+                <button type="submit" class="button button-primary" data-busy-text="Saving staff...">Save Staff</button>
             </div>
         </form>
     </div>

@@ -4,7 +4,6 @@
 <div class="container">
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Inventory Catalog</p>
             <h1 class="page-title">Product Catalog</h1>
             <p class="page-lead">
                 {{ $viewArchived
@@ -13,7 +12,10 @@
             </p>
         </div>
         <div class="directory-header-actions">
-            <a href="{{ route('products.create') }}" class="button button-primary">+ Add Product</a>
+            <a href="{{ route('products.create') }}" class="button button-primary">
+                <x-icon name="plus" :size="15" />
+                <span>Add Product</span>
+            </a>
         </div>
     </header>
 
@@ -33,6 +35,7 @@
 
     @if ($products->isEmpty())
         <div class="empty-ledger-card">
+            <div class="empty-ledger-icon"><x-icon name="package" :size="32" /></div>
             <h2 class="empty-ledger-title">{{ $viewArchived ? 'No Archived Products' : 'No Active Products' }}</h2>
             <p class="empty-ledger-desc">
                 {{ $viewArchived
@@ -42,7 +45,10 @@
             @if ($viewArchived)
                 <a href="{{ route('products.index') }}" class="button button-secondary">Return to Active Catalog</a>
             @else
-                <a href="{{ route('products.create') }}" class="button button-primary">+ Add First Product</a>
+                <a href="{{ route('products.create') }}" class="button button-primary">
+                    <x-icon name="plus" :size="15" />
+                    <span>Add Product</span>
+                </a>
             @endif
         </div>
     @else
@@ -64,17 +70,6 @@
                         @php
                             $stockQty = (int) $product->stock_quantity;
                             $salesCount = (int) $product->sales_count;
-
-                            if ($stockQty <= 0) {
-                                $stockClass = 'status-out';
-                                $stockLabel = 'Out of stock';
-                            } elseif ($stockQty <= \App\Models\Product::LOW_STOCK_THRESHOLD) {
-                                $stockClass = 'status-low';
-                                $stockLabel = 'low stock';
-                            } else {
-                                $stockClass = 'status-ok';
-                                $stockLabel = 'in stock';
-                            }
                         @endphp
                         <tr>
                             <td class="num-col" data-label="ID">{{ $product->id }}</td>
@@ -100,9 +95,7 @@
                                 ${{ number_format((float) $product->price, 2) }}
                             </td>
                             <td data-label="Stock">
-                                <span class="status-pill {{ $stockClass }}">
-                                    {{ $stockQty === 0 ? $stockLabel : $stockQty.' '.$stockLabel }}
-                                </span>
+                                <x-stock-indicator :quantity="$product->stock_quantity" />
                             </td>
                             <td class="mono-num" data-label="Added">
                                 {{ $product->created_at?->format('M j, Y') }}
@@ -110,7 +103,10 @@
                             <td class="col-actions" data-label="Actions">
                                 <div class="table-actions-group">
                                     @if (! $viewArchived)
-                                        <a href="{{ route('products.edit', $product) }}" class="button button-secondary button-sm">Edit</a>
+                                        <a href="{{ route('products.edit', $product) }}" class="button button-secondary button-sm">
+                                            <x-icon name="pencil-simple" :size="14" />
+                                            <span>Edit</span>
+                                        </a>
                                         <form
                                             action="{{ route('products.destroy', $product->id) }}"
                                             method="POST"
@@ -118,15 +114,22 @@
                                             data-confirm-title="Archive Product"
                                             data-confirm-message="Archive {{ $product->name }}? It will be hidden from the register while keeping sales history intact."
                                             data-confirm-action="Archive"
+                                            data-confirm-tone="primary"
                                         >
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="button button-danger button-sm">Archive</button>
+                                            <button type="submit" class="button button-ghost-action button-sm">
+                                                <x-icon name="archive" :size="14" />
+                                                <span>Archive</span>
+                                            </button>
                                         </form>
                                     @else
                                         <form action="{{ route('products.restore', $product->id) }}" method="POST" class="inline-form">
                                             @csrf
-                                            <button type="submit" class="button button-primary button-sm">Restore</button>
+                                            <button type="submit" class="button button-primary button-sm">
+                                                <x-icon name="arrow-counter-clockwise" :size="14" />
+                                                <span>Restore</span>
+                                            </button>
                                         </form>
                                         @if ($salesCount === 0)
                                             <form
@@ -139,8 +142,13 @@
                                             >
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="button button-danger button-sm">Purge</button>
+                                                <button type="submit" class="button button-ghost-danger button-sm">
+                                                    <x-icon name="trash" :size="14" />
+                                                    <span>Purge</span>
+                                                </button>
                                             </form>
+                                        @else
+                                            <span class="table-action-spacer" aria-hidden="true"></span>
                                         @endif
                                     @endif
                                 </div>

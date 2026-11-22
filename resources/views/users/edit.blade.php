@@ -3,22 +3,20 @@
 @section('content')
 <div class="container">
     <div class="back-link-row">
-        <a href="{{ route('users.index') }}" class="back-link">&larr; Back to Staff</a>
+        <a href="{{ route('users.index') }}" class="back-link">
+            <x-icon name="arrow-left" :size="15" />
+            <span>Back to Staff</span>
+        </a>
     </div>
 
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Staff Directory</p>
             <h1 class="page-title">Edit Staff: {{ $user->full_name }}</h1>
-            <p class="page-lead">Update account details, rotate password, or upload a new avatar.</p>
+            <p class="page-lead">Update operator details, set a new password, or replace the avatar.</p>
         </div>
     </header>
 
-    <div class="form-card" style="max-width: 760px;">
-        <div class="form-card-header">
-            <h2 class="form-section-title">Staff Account Details</h2>
-        </div>
-
+    <div class="form-card form-measure">
         @include('partials.error_summary')
 
         <form action="{{ route('users.update', $user) }}" method="POST" enctype="multipart/form-data" novalidate>
@@ -28,7 +26,7 @@
 
             <div class="form-actions">
                 <a href="{{ route('users.index') }}" class="button button-secondary">Cancel</a>
-                <button type="submit" class="button button-primary" data-busy-text="Updating account...">Update Staff User</button>
+                <button type="submit" class="button button-primary" data-busy-text="Updating staff...">Update Staff</button>
             </div>
         </form>
     </div>

@@ -1,8 +1,8 @@
 /**
  * Bright-Market POS client interactions.
  * Handles responsive popover navigation, native confirmation dialogs,
- * password visibility toggles, form submission guards, live image previews,
- * and checkout register total/stock preview.
+ * password visibility toggles, custom file picker triggers, quantity steppers,
+ * dismissible flash banners, live image previews, and checkout summary preview.
  */
 (() => {
     'use strict';
@@ -15,10 +15,6 @@
         'image/webp',
     ]);
 
-    /**
-     * Measure header overflow cleanly and toggle between wide inline nav
-     * and compact popover menu mode without tearing down an open compact menu.
-     */
     function initResponsiveNavbar() {
         const header = document.querySelector('.site-header');
         const toggleBtn = document.querySelector('.nav-menu-toggle');
@@ -79,11 +75,17 @@
             navMenu.removeAttribute('popover');
 
             const headerInner = header.querySelector('.header-container');
+            const sessionZone = header.querySelector('.header-session-zone');
+            const navRect = navMenu.getBoundingClientRect();
+            const sessionRect = sessionZone ? sessionZone.getBoundingClientRect() : null;
+            const collidesWithSession = Boolean(
+                sessionRect && navRect.width > 0 && navRect.right > sessionRect.left - 8
+            );
             const overflows = headerInner
                 ? headerInner.scrollWidth > headerInner.clientWidth + 1
                 : header.scrollWidth > header.clientWidth + 1;
 
-            const shouldBeWide = !overflows && window.innerWidth >= 980;
+            const shouldBeWide = !overflows && !collidesWithSession && window.innerWidth >= 980;
             currentWide = null;
             applyMode(shouldBeWide);
         };
@@ -118,9 +120,28 @@
         measure();
     }
 
-    /**
-     * Progressive enhancement for destructive/archive action forms using native <dialog>.
-     */
+    function initFlashDismiss() {
+        document.querySelectorAll('[data-dismiss-alert]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const alert = btn.closest('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            });
+        });
+
+        document.querySelectorAll('.alert[data-auto-dismiss]').forEach((alert) => {
+            const delay = parseInt(alert.getAttribute('data-auto-dismiss') || '0', 10);
+            if (delay > 0) {
+                window.setTimeout(() => {
+                    if (alert.isConnected) {
+                        alert.remove();
+                    }
+                }, delay);
+            }
+        });
+    }
+
     function initConfirmDialog() {
         const dialog = document.getElementById('confirm-action-dialog');
         if (!dialog || typeof dialog.showModal !== 'function') {
@@ -195,9 +216,6 @@
         });
     }
 
-    /**
-     * Toggle password input visibility with explicit aria-pressed state.
-     */
     function initPasswordToggles() {
         document.querySelectorAll('[data-password-toggle]').forEach((button) => {
             button.addEventListener('click', () => {
@@ -210,15 +228,20 @@
                 const reveal = input.type === 'password';
                 input.type = reveal ? 'text' : 'password';
                 button.setAttribute('aria-pressed', reveal ? 'true' : 'false');
-                button.textContent = reveal ? 'Hide' : 'Show';
                 button.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
+
+                const showIcon = button.querySelector('[data-icon-show]');
+                const hideIcon = button.querySelector('[data-icon-hide]');
+                if (showIcon && hideIcon) {
+                    showIcon.hidden = reveal;
+                    hideIcon.hidden = !reveal;
+                } else {
+                    button.textContent = reveal ? 'Hide' : 'Show';
+                }
             });
         });
     }
 
-    /**
-     * Prevent accidental double clicks from submitting forms multiple times.
-     */
     function initSubmitBusyState() {
         document.addEventListener('submit', (event) => {
             const form = event.target;
@@ -229,7 +252,9 @@
                 return;
             }
 
-            const submitBtn = form.querySelector('button[type="submit"][data-busy-text]');
+            const formId = form.getAttribute('id');
+            const submitBtn = form.querySelector('button[type="submit"][data-busy-text]')
+                || (formId ? document.querySelector(`button[type="submit"][form="${formId}"][data-busy-text]`) : null);
             if (!(submitBtn instanceof HTMLButtonElement)) {
                 return;
             }
@@ -252,10 +277,17 @@
         });
     }
 
-    /**
-     * Live image/avatar upload preview with safe MIME and size feedback.
-     */
     function initImagePreviews() {
+        document.querySelectorAll('[data-file-trigger]').forEach((trigger) => {
+            trigger.addEventListener('click', () => {
+                const inputId = trigger.getAttribute('data-file-trigger');
+                const input = inputId ? document.getElementById(inputId) : null;
+                if (input instanceof HTMLInputElement) {
+                    input.click();
+                }
+            });
+        });
+
         document.querySelectorAll('input[type="file"][data-preview-img]').forEach((input) => {
             if (!(input instanceof HTMLInputElement)) {
                 return;
@@ -317,29 +349,27 @@
 
                 if (statusEl) {
                     const kb = Math.max(1, Math.round(file.size / 1024));
-                    statusEl.textContent = `Ready to upload: ${file.name} (${kb} KB)`;
+                    statusEl.textContent = `Selected: ${file.name} (${kb} KB)`;
                 }
             });
         });
     }
 
-    /**
-     * Live receipt summary updates on Record Sale page.
-     */
     function initSalePreview() {
         const productSelect = document.getElementById('sale-product');
         const qtyInput = document.getElementById('sale-quantity');
-        const nameOut = document.getElementById('preview-product-name');
         const priceOut = document.getElementById('preview-unit-price');
-        const stockOut = document.getElementById('preview-available-stock');
         const remainingOut = document.getElementById('preview-remaining-stock');
         const totalOut = document.getElementById('preview-order-total');
         const warningEl = document.getElementById('preview-stock-warning');
+        const decBtn = document.getElementById('qty-decrement');
+        const incBtn = document.getElementById('qty-increment');
+        const recoveryBtn = document.getElementById('qty-set-max');
 
         if (
             !(productSelect instanceof HTMLSelectElement) ||
             !(qtyInput instanceof HTMLInputElement) ||
-            !nameOut || !priceOut || !stockOut || !remainingOut || !totalOut || !warningEl
+            !priceOut || !remainingOut || !totalOut || !warningEl
         ) {
             return;
         }
@@ -347,27 +377,46 @@
         let serverInvalidQty = qtyInput.getAttribute('aria-invalid') === 'true';
         const initialQtyValue = qtyInput.value;
 
+        const qtyErrorEl = document.getElementById('sale_quantity_error');
+        const formErrorSummary = document.getElementById('form-error-summary');
+        const clearServerOversell = () => {
+            serverInvalidQty = false;
+            if (qtyErrorEl) {
+                qtyErrorEl.hidden = true;
+            }
+            if (formErrorSummary) {
+                formErrorSummary.hidden = true;
+            }
+            if (recoveryBtn) {
+                recoveryBtn.hidden = true;
+            }
+        };
+
+        if (serverInvalidQty) {
+            qtyInput.focus();
+        }
+
         const updateSummary = (isUserEdit = false) => {
             if (isUserEdit && qtyInput.value !== initialQtyValue) {
-                serverInvalidQty = false;
+                clearServerOversell();
             }
 
             const option = productSelect.options[productSelect.selectedIndex];
             if (!option || !option.value) {
-                nameOut.textContent = 'None selected';
                 priceOut.textContent = '$0.00';
-                stockOut.textContent = 'Select product';
-                stockOut.classList.remove('mono-num');
                 remainingOut.textContent = 'Select product';
                 remainingOut.classList.remove('mono-num', 'is-oversell');
                 totalOut.textContent = '$0.00';
                 warningEl.hidden = true;
+                qtyInput.removeAttribute('max');
                 qtyInput.setAttribute('aria-invalid', serverInvalidQty ? 'true' : 'false');
                 return;
             }
 
             const price = parseFloat(option.dataset.price || '0');
             const stock = parseInt(option.dataset.stock || '0', 10);
+            qtyInput.setAttribute('max', String(stock));
+
             const rawTrimmed = qtyInput.value.trim();
             const parsedNum = Number(rawTrimmed);
             const isWholePositive = rawTrimmed !== '' && Number.isInteger(parsedNum) && parsedNum > 0;
@@ -375,28 +424,42 @@
             const remaining = stock - validQty;
             const total = price * validQty;
 
-            nameOut.textContent = option.dataset.name || option.textContent || 'Selected product';
             priceOut.textContent = '$' + price.toFixed(2);
-            stockOut.textContent = String(stock);
-            stockOut.classList.add('mono-num');
             remainingOut.textContent = validQty > 0 ? String(remaining) : String(stock);
             remainingOut.classList.add('mono-num');
             totalOut.textContent = '$' + total.toFixed(2);
 
             const oversell = validQty > stock;
             remainingOut.classList.toggle('is-oversell', oversell);
-            warningEl.hidden = !oversell;
+            warningEl.hidden = !oversell || (serverInvalidQty && qtyErrorEl && !qtyErrorEl.hidden);
 
             const isInvalid = oversell || (rawTrimmed !== '' && !isWholePositive);
-            if (isInvalid || serverInvalidQty) {
-                qtyInput.setAttribute('aria-invalid', 'true');
-            } else {
-                qtyInput.setAttribute('aria-invalid', 'false');
-            }
+            qtyInput.setAttribute('aria-invalid', (isInvalid || serverInvalidQty) ? 'true' : 'false');
         };
 
+        const stepQuantity = (delta) => {
+            const current = parseInt(qtyInput.value || '1', 10);
+            const maxVal = parseInt(qtyInput.getAttribute('max') || '999999', 10);
+            const base = Number.isNaN(current) ? 1 : current + delta;
+            const next = Math.max(1, Math.min(maxVal, base));
+            qtyInput.value = String(next);
+            clearServerOversell();
+            updateSummary(true);
+        };
+
+        decBtn?.addEventListener('click', () => stepQuantity(-1));
+        incBtn?.addEventListener('click', () => stepQuantity(1));
+
+        recoveryBtn?.addEventListener('click', () => {
+            const maxVal = recoveryBtn.dataset.maxStock || qtyInput.getAttribute('max') || '1';
+            qtyInput.value = maxVal;
+            clearServerOversell();
+            updateSummary(true);
+            qtyInput.focus();
+        });
+
         productSelect.addEventListener('change', () => {
-            serverInvalidQty = false;
+            clearServerOversell();
             updateSummary(true);
         });
         qtyInput.addEventListener('input', () => updateSummary(true));
@@ -404,6 +467,7 @@
     }
 
     initResponsiveNavbar();
+    initFlashDismiss();
     initConfirmDialog();
     initPasswordToggles();
     initSubmitBusyState();

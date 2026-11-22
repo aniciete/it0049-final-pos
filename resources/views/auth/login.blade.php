@@ -1,10 +1,7 @@
 <x-guest-layout>
     <div class="auth-card">
         <header class="auth-header">
-            <h1 class="auth-title">Staff Sign In</h1>
-            <p class="auth-subtitle">
-                Enter your staff username or email address and password to access POS management and sales checkout.
-            </p>
+            <h1 class="auth-title">Sign In</h1>
         </header>
 
         @include('partials.error_summary')
@@ -24,7 +21,6 @@
                     autocorrect="off"
                     autocapitalize="none"
                     spellcheck="false"
-                    placeholder="e.g. admin.reyes or admin.reyes@brightmarket.test"
                     required
                     autofocus
                     aria-invalid="{{ ($errors->has('login') || $errors->has('email')) ? 'true' : 'false' }}"
@@ -35,32 +31,14 @@
                 @endif
             </div>
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-with-toggle">
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        class="form-control"
-                        autocomplete="current-password"
-                        required
-                        aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                        @error('password') aria-describedby="password_error" @enderror
-                    >
-                    <button
-                        type="button"
-                        class="password-toggle-btn"
-                        data-password-toggle="password"
-                        aria-controls="password"
-                        aria-pressed="false"
-                        aria-label="Show password"
-                    >Show</button>
-                </div>
-                @error('password')
-                    <p id="password_error" class="form-field-error">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-password-input
+                id="password"
+                name="password"
+                label="Password"
+                autocomplete="current-password"
+                :required="true"
+                error-id="password_error"
+            />
 
             <div class="auth-meta-row">
                 <label for="remember_me" class="checkbox-inline">
@@ -74,15 +52,21 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ route('register') }}" class="button button-secondary">Register Account</a>
-                <button type="submit" class="button button-primary" data-busy-text="Signing in...">Sign In</button>
+                <button type="submit" class="button button-primary button-block" data-busy-text="Signing in...">
+                    <x-icon name="sign-in" :size="15" />
+                    <span>Sign In</span>
+                </button>
             </div>
         </form>
 
-        <aside class="auth-demo-note" aria-label="Seeded demo staff credentials">
-            <strong>Demo Staff Credentials:</strong><br>
-            Username: <code>admin.reyes</code> (or <code>admin.reyes@brightmarket.test</code>)<br>
-            Password: <code>POSDemo!2026</code>
-        </aside>
+        <p class="auth-secondary-link-row">
+            Need an account? <a href="{{ route('register') }}" class="table-link">Register</a>
+        </p>
     </div>
+
+    @if (config('app.demo_hint'))
+        <p class="auth-demo-caption">
+            Demo account: <code>admin.reyes</code> / <code>POSDemo!2026</code>
+        </p>
+    @endif
 </x-guest-layout>

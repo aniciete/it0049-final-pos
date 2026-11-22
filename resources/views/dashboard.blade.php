@@ -4,53 +4,61 @@
 <div class="container">
     <header class="directory-header">
         <div>
-            <p class="eyebrow">Authenticated Workspace</p>
             <h1 class="page-title">Operations Dashboard</h1>
             <p class="page-lead">
-                Signed in as <strong>{{ Auth::user()->full_name }}</strong>
-                (<span class="mono-num">{{ Auth::user()->username }}</span> &bull; {{ Auth::user()->role }}).
+                Today: <span class="mono-num">{{ $todaySalesCount }}</span> {{ \Illuminate\Support\Str::plural('sale', $todaySalesCount) }}
+                (<span class="mono-num">${{ number_format($todayRevenue, 2) }}</span>)
+                @if ($lowStockCount > 0)
+                    &middot; <span class="kpi-alert-text">{{ $lowStockCount }} {{ \Illuminate\Support\Str::plural('item', $lowStockCount) }} need restock</span>
+                @endif
             </p>
         </div>
         <div class="directory-header-actions">
-            <a href="{{ route('sales.create') }}" class="button button-primary">+ Record Sale</a>
+            <a href="{{ route('sales.create') }}" class="button button-primary">
+                <x-icon name="plus" :size="15" />
+                <span>Record Sale</span>
+            </a>
             <a href="{{ route('profile.edit') }}" class="button button-secondary">My Profile</a>
         </div>
     </header>
 
     <div class="kpi-ledger-grid" aria-label="Operations Metrics">
-        <div class="kpi-cell">
+        <a href="{{ route('products.index') }}" class="kpi-cell kpi-cell-link">
             <span class="metric-label">Active Products</span>
             <span class="kpi-value mono-num">{{ $productCount }}</span>
-            <span class="kpi-sub">{{ $lowStockCount }} low/out of stock &bull; <a href="{{ route('products.index') }}" class="table-link">Manage</a></span>
-        </div>
-        <div class="kpi-cell">
+            <span class="kpi-sub {{ $lowStockCount > 0 ? 'kpi-alert-text' : '' }}">
+                {{ $lowStockCount }} low or out of stock
+            </span>
+        </a>
+        <a href="{{ route('sales.index') }}" class="kpi-cell kpi-cell-link">
             <span class="metric-label">Completed Sales</span>
             <span class="kpi-value mono-num">{{ $salesCount }}</span>
-            <span class="kpi-sub">${{ number_format($totalRevenue, 2) }} gross revenue &bull; <a href="{{ route('sales.index') }}" class="table-link">History</a></span>
-        </div>
-        <div class="kpi-cell">
+            <span class="kpi-sub">${{ number_format($totalRevenue, 2) }} total revenue</span>
+        </a>
+        <a href="{{ route('customers.index') }}" class="kpi-cell kpi-cell-link">
             <span class="metric-label">Customers</span>
             <span class="kpi-value mono-num">{{ $customerCount }}</span>
-            <span class="kpi-sub">Active accounts &bull; <a href="{{ route('customers.index') }}" class="table-link">Directory</a></span>
-        </div>
-        <div class="kpi-cell">
-            <span class="metric-label">Staff Operators</span>
+            <span class="kpi-sub">Registered customer directory</span>
+        </a>
+        <a href="{{ route('users.index') }}" class="kpi-cell kpi-cell-link">
+            <span class="metric-label">Staff</span>
             <span class="kpi-value mono-num">{{ $userCount }}</span>
-            <span class="kpi-sub">Authorized personnel &bull; <a href="{{ route('users.index') }}" class="table-link">Manage</a></span>
-        </div>
+            <span class="kpi-sub">Authorized store accounts</span>
+        </a>
     </div>
 
     <section style="margin-top: var(--space-6);" aria-labelledby="recent-sales-heading">
         <div class="section-header-row">
             <h2 id="recent-sales-heading" class="section-title">Recent Transactions</h2>
-            <a href="{{ route('sales.index') }}" class="table-link">View Full Sales History</a>
+            <a href="{{ route('sales.index') }}" class="table-link">Sales History</a>
         </div>
 
         @if ($recentSales->isEmpty())
             <div class="empty-ledger-card">
+                <div class="empty-ledger-icon"><x-icon name="receipt" :size="32" /></div>
                 <h3 class="empty-ledger-title">No Sales Recorded Yet</h3>
-                <p class="empty-ledger-desc">Open the Checkout Register to process your first order.</p>
-                <a href="{{ route('sales.create') }}" class="button button-primary">Open Sale Register</a>
+                <p class="empty-ledger-desc">Open Record Sale to process your first order.</p>
+                <a href="{{ route('sales.create') }}" class="button button-primary">Record Sale</a>
             </div>
         @else
             <div class="table-wrapper" tabindex="0" role="region" aria-label="Recent sales transactions">
@@ -60,7 +68,7 @@
                             <th scope="col" class="num-col">Receipt</th>
                             <th scope="col">Product</th>
                             <th scope="col">Customer</th>
-                            <th scope="col">Staff</th>
+                            <th scope="col">Staff Member</th>
                             <th scope="col" class="num-col">Qty</th>
                             <th scope="col" class="num-col">Total</th>
                             <th scope="col">Date</th>
@@ -69,17 +77,19 @@
                     <tbody>
                         @foreach ($recentSales as $sale)
                             <tr>
-                                <td class="num-col mono-num" data-label="Receipt">#{{ $sale->id }}</td>
+                                <td class="num-col mono-num" data-label="Receipt">
+                                    <a href="{{ route('sales.show', $sale) }}" class="table-link">#{{ $sale->id }}</a>
+                                </td>
                                 <td data-label="Product">
-                                    <span class="cell-primary">{{ $sale->product?->name ?? 'Archived Product' }}</span>
+                                    <span class="cell-product-title">{{ $sale->product?->name ?? 'Removed Product' }}</span>
                                 </td>
                                 <td data-label="Customer">
-                                    {{ $sale->customer?->full_name ?? 'Walk-in Customer' }}
+                                    {{ $sale->customer?->full_name ?? 'Walk-in' }}
                                 </td>
-                                <td data-label="Staff">{{ $sale->seller?->full_name ?? 'System' }}</td>
+                                <td data-label="Staff Member">{{ $sale->seller?->full_name ?? 'System' }}</td>
                                 <td class="num-col mono-num" data-label="Qty">{{ $sale->quantity }}</td>
-                                <td class="num-col mono-num" data-label="Total">${{ number_format((float) $sale->total_price, 2) }}</td>
-                                <td class="mono-num" data-label="Date">{{ $sale->created_at?->format('M j, Y H:i') }}</td>
+                                <td class="num-col mono-num" data-label="Total Price">${{ number_format((float) $sale->total_price, 2) }}</td>
+                                <td class="mono-num" data-label="Transaction Date">{{ $sale->created_at?->format('M j, Y g:i A') }}</td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -1,5 +1,6 @@
 @php
     $isEdit = $user->exists;
+    $isSelf = $isEdit && $user->is(Auth::user());
 @endphp
 
 <div class="form-grid">
@@ -44,9 +45,7 @@
 
     <div class="form-row-two">
         <div class="form-group">
-            <label for="user-email" class="form-label">
-                Email Address <span class="form-label-optional">(Optional)</span>
-            </label>
+            <label for="user-email" class="form-label">Email Address</label>
             <input
                 type="email"
                 id="user-email"
@@ -54,10 +53,10 @@
                 class="form-control"
                 value="{{ old('email', $user->email) }}"
                 maxlength="150"
-                placeholder="e.g. staff@brightmarket.test"
                 aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
                 @error('email') aria-describedby="user_email_error" @enderror
             >
+            <p class="form-hint">Optional. Used for notifications and account recovery.</p>
             @error('email')
                 <p id="user_email_error" class="form-field-error">{{ $message }}</p>
             @enderror
@@ -65,10 +64,14 @@
 
         <div class="form-group">
             <label for="user-role" class="form-label">Role</label>
+            @if ($isSelf)
+                <input type="hidden" name="role" value="{{ $user->role }}">
+            @endif
             <select
                 id="user-role"
-                name="role"
+                @unless ($isSelf) name="role" @endunless
                 class="form-control"
+                {{ $isSelf ? 'disabled' : '' }}
                 aria-invalid="{{ $errors->has('role') ? 'true' : 'false' }}"
                 @error('role') aria-describedby="user_role_error" @enderror
             >
@@ -78,6 +81,9 @@
                     </option>
                 @endforeach
             </select>
+            @if ($isSelf)
+                <p class="form-hint">You cannot change your own operational role.</p>
+            @endif
             @error('role')
                 <p id="user_role_error" class="form-field-error">{{ $message }}</p>
             @enderror
@@ -85,95 +91,42 @@
     </div>
 
     <div class="form-row-two">
-        <div class="form-group">
-            <label for="user-password" class="form-label">
-                {{ $isEdit ? 'New Password' : 'Password' }}
-                @if ($isEdit)
-                    <span class="form-label-optional">(Leave blank to keep current)</span>
-                @endif
-            </label>
-            <div class="input-with-toggle">
-                <input
-                    type="password"
-                    id="user-password"
-                    name="password"
-                    class="form-control"
-                    autocomplete="new-password"
-                    {{ $isEdit ? '' : 'required' }}
-                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                    @error('password') aria-describedby="user_password_error" @enderror
-                >
-                <button
-                    type="button"
-                    class="password-toggle-btn"
-                    data-password-toggle="user-password"
-                    aria-controls="user-password"
-                    aria-pressed="false"
-                    aria-label="Show password"
-                >Show</button>
-            </div>
-            @error('password')
-                <p id="user_password_error" class="form-field-error">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-password-input
+            id="user-password"
+            name="password"
+            :label="$isEdit ? 'New Password' : 'Password'"
+            autocomplete="new-password"
+            :required="! $isEdit"
+            error-id="user_password_error"
+            :hint="$isEdit ? 'Leave blank to keep the current password.' : null"
+        />
 
-        <div class="form-group">
-            <label for="user-password-confirmation" class="form-label">Confirm Password</label>
-            <input
-                type="password"
-                id="user-password-confirmation"
-                name="password_confirmation"
-                class="form-control"
-                autocomplete="new-password"
-                {{ $isEdit ? '' : 'required' }}
-            >
-        </div>
+        <x-password-input
+            id="user-password-confirmation"
+            name="password_confirmation"
+            label="Confirm Password"
+            autocomplete="new-password"
+            :required="! $isEdit"
+            toggle-label="Show confirm password"
+            :show-errors="false"
+        />
     </div>
 
-    <div class="form-group">
-        <label for="user-avatar" class="form-label">
-            Avatar Image <span class="form-label-optional">(Optional — JPG, PNG, WebP up to 2 MB)</span>
-        </label>
-
-        <div class="media-preview-row">
-            <img
-                id="user-avatar-preview"
-                src="{{ $user->avatarUrl() }}"
-                data-default-src="{{ $user->avatarUrl() }}"
-                alt="{{ $user->full_name ?: 'Staff' }} avatar preview"
-                class="media-preview-thumb"
-                width="64"
-                height="64"
-            >
-            <div>
-                <p id="user-avatar-status" class="form-hint" style="font-weight: 700; color: var(--basil);">
-                    {{ $user->hasAvatar() ? 'Current avatar stored on public disk' : 'No custom avatar uploaded (using placeholder)' }}
-                </p>
-                <p class="form-hint">Avatars are cropped cleanly to 256&times;256 on save.</p>
-            </div>
-        </div>
-
-        <input
-            type="file"
-            id="user-avatar"
-            name="avatar"
-            class="form-control"
-            accept="image/jpeg,image/png,image/webp"
-            data-preview-img="user-avatar-preview"
-            data-preview-status="user-avatar-status"
-            data-remove-checkbox="remove_avatar"
-            aria-invalid="{{ $errors->has('avatar') ? 'true' : 'false' }}"
-            @error('avatar') aria-describedby="user_avatar_error" @enderror
-        >
-        @error('avatar')
-            <p id="user_avatar_error" class="form-field-error">{{ $message }}</p>
-        @enderror
-
-        @if ($isEdit && $user->hasAvatar())
-            <label for="remove_avatar" class="checkbox-inline" style="margin-top: var(--space-1);">
-                <input id="remove_avatar" type="checkbox" name="remove_avatar" value="1" class="checkbox-input" {{ old('remove_avatar') ? 'checked' : '' }}>
-                <span>Remove existing avatar on save</span>
-            </label>
-        @endif
-    </div>
+    <x-media-picker
+        field-id="user-avatar"
+        input-name="avatar"
+        label="Avatar"
+        preview-id="user-avatar-preview"
+        status-id="user-avatar-status"
+        :default-src="$user->avatarUrl()"
+        :alt="($user->full_name ?: 'Staff').' avatar preview'"
+        :has-media="$user->hasAvatar()"
+        active-status="Current avatar active."
+        empty-status="No custom avatar uploaded."
+        help-text="Optional. JPG, PNG, or WebP up to 2 MB, cropped to 256x256."
+        remove-name="remove_avatar"
+        remove-label="Remove existing avatar on save"
+        error-id="user_avatar_error"
+        :is-edit="$isEdit"
+    />
 </div>

@@ -8,30 +8,34 @@
         @method('PUT')
 
         <div class="form-grid">
-            <div class="form-group">
-                <label for="update_password_current_password" class="form-label">Current Password</label>
-                <input id="update_password_current_password" name="current_password" type="password" class="form-control" autocomplete="current-password">
-                @if ($errors->updatePassword->has('current_password'))
-                    <p class="form-field-error">{{ $errors->updatePassword->first('current_password') }}</p>
-                @endif
-            </div>
+            <x-password-input
+                id="update_password_current_password"
+                name="current_password"
+                label="Current Password"
+                autocomplete="current-password"
+                error-bag="updatePassword"
+                error-id="update_current_password_error"
+            />
 
             <div class="form-row-two">
-                <div class="form-group">
-                    <label for="update_password_password" class="form-label">New Password</label>
-                    <input id="update_password_password" name="password" type="password" class="form-control" autocomplete="new-password">
-                    @if ($errors->updatePassword->has('password'))
-                        <p class="form-field-error">{{ $errors->updatePassword->first('password') }}</p>
-                    @endif
-                </div>
+                <x-password-input
+                    id="update_password_password"
+                    name="password"
+                    label="New Password"
+                    autocomplete="new-password"
+                    error-bag="updatePassword"
+                    error-id="update_new_password_error"
+                />
 
-                <div class="form-group">
-                    <label for="update_password_password_confirmation" class="form-label">Confirm Password</label>
-                    <input id="update_password_password_confirmation" name="password_confirmation" type="password" class="form-control" autocomplete="new-password">
-                    @if ($errors->updatePassword->has('password_confirmation'))
-                        <p class="form-field-error">{{ $errors->updatePassword->first('password_confirmation') }}</p>
-                    @endif
-                </div>
+                <x-password-input
+                    id="update_password_password_confirmation"
+                    name="password_confirmation"
+                    label="Confirm Password"
+                    autocomplete="new-password"
+                    error-bag="updatePassword"
+                    error-id="update_confirm_password_error"
+                    toggle-label="Show confirm password"
+                />
             </div>
         </div>
 
