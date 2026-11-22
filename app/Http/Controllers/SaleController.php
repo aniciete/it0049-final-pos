@@ -6,22 +6,32 @@ use App\Http\Requests\StoreSaleRequest;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\User;
 use App\Services\SaleService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SaleController extends Controller
 {
     /**
-     * Display chronological sales history ledger with transaction summary metrics.
+     * Display chronological sales history ledger with optional search and date/staff filters.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = [
+            'q' => trim((string) $request->query('q', '')),
+            'staff' => $request->integer('staff') ?: null,
+            'customer' => $request->integer('customer') ?: null,
+            'from' => trim((string) $request->query('from', '')),
+            'to' => trim((string) $request->query('to', '')),
+        ];
+
         $sales = Sale::query()
             ->with(['product', 'customer', 'seller'])
-            ->latest('created_at')
-            ->latest('id')
+            ->filter($filters)
+            ->latestLedger()
             ->get();
 
         $summary = [
@@ -35,6 +45,9 @@ class SaleController extends Controller
             'activePage' => 'sales',
             'sales' => $sales,
             'summary' => $summary,
+            'filters' => $filters,
+            'staffFilterUser' => $filters['staff'] ? User::query()->find($filters['staff']) : null,
+            'customerFilterRecord' => $filters['customer'] ? Customer::query()->find($filters['customer']) : null,
         ]);
     }
 
@@ -65,11 +78,13 @@ class SaleController extends Controller
         try {
             $result = $saleService->recordSale($productId, $customerId, $soldBy, $quantity);
         } catch (ValidationException $e) {
+            $available = Product::query()->whereKey($productId)->value('stock_quantity');
+
             return redirect()
                 ->back()
                 ->withInput()
                 ->withErrors($e->errors())
-                ->with('error', collect($e->errors())->flatten()->first() ?? 'Unable to record sale.');
+                ->with('available_stock', $available !== null ? (int) $available : null);
         }
 
         $sale = $result['sale'];
@@ -82,5 +97,19 @@ class SaleController extends Controller
                 'success',
                 "Sale #{$sale->id} recorded: {$quantity}x {$product->name} (\${$sale->total_price}). Remaining stock: {$remaining}."
             );
+    }
+
+    /**
+     * Display an individual receipt record from Sales History.
+     */
+    public function show(Sale $sale): View
+    {
+        $sale->load(['product', 'customer', 'seller']);
+
+        return view('sales.show', [
+            'title' => "Receipt #{$sale->id} | Bright-Market POS",
+            'activePage' => 'sales',
+            'sale' => $sale,
+        ]);
     }
 }

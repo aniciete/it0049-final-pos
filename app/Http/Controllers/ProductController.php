@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\LoadsRecentSales;
 use App\Http\Requests\SaveProductRequest;
 use App\Models\Product;
 use App\Services\ImageUploadService;
@@ -12,6 +13,8 @@ use Throwable;
 
 class ProductController extends Controller
 {
+    use LoadsRecentSales;
+
     /**
      * Display active or archived products catalog with stock badges and image thumbnails.
      */
@@ -84,13 +87,9 @@ class ProductController extends Controller
      */
     public function show(int $product): View
     {
-        $record = Product::withTrashed()->withCount('sales')->findOrFail($product);
+        $record = Product::withTrashed()->findOrFail($product);
 
-        return view('products.show', [
-            'title' => $record->name.' | Products | Bright-Market POS',
-            'activePage' => 'products',
-            'product' => $record,
-        ]);
+        return $this->renderProductContext('products.show', $record->name.' | Bright-Market POS', $record);
     }
 
     /**
@@ -98,10 +97,21 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
-        return view('products.edit', [
-            'title' => 'Edit Product | Bright-Market POS',
+        return $this->renderProductContext('products.edit', 'Edit Product | Bright-Market POS', $product);
+    }
+
+    /**
+     * Render a product detail or edit view with its latest linked sales.
+     */
+    private function renderProductContext(string $view, string $title, Product $product): View
+    {
+        $recentSales = $this->loadRecentSalesContext($product, ['customer', 'seller']);
+
+        return view($view, [
+            'title' => $title,
             'activePage' => 'products',
             'product' => $product,
+            'recentSales' => $recentSales,
         ]);
     }
 

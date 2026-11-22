@@ -11,29 +11,24 @@ use Illuminate\View\View;
 class PageController extends Controller
 {
     /**
-     * Display the public Bright-Market POS landing overview.
+     * Display the public Bright-Market POS overview.
      */
     public function home(): View
     {
         return view('pages.home', [
-            'title' => 'Bright-Market POS | Laravel MVC System',
+            'title' => 'Bright-Market POS',
             'activePage' => 'home',
-            'productCount' => Product::query()->count(),
-            'lowStockCount' => Product::query()->lowStock()->count(),
-            'customerCount' => Customer::query()->count(),
-            'userCount' => User::query()->count(),
-            'salesCount' => Sale::query()->count(),
-            'totalRevenue' => (float) Sale::query()->sum('total_price'),
+            ...$this->storeMetrics(),
         ]);
     }
 
     /**
-     * Display the system architecture, 4-table ERD summary, and security overview.
+     * Display the system data model and operational safeguards overview.
      */
     public function about(): View
     {
         return view('pages.about', [
-            'title' => 'Architecture & Schema | Bright-Market POS',
+            'title' => 'System Overview | Bright-Market POS',
             'activePage' => 'about',
         ]);
     }
@@ -43,21 +38,36 @@ class PageController extends Controller
      */
     public function dashboard(): View
     {
+        $todayQuery = Sale::query()->whereDate('created_at', today());
+
         return view('dashboard', [
             'title' => 'Operations Dashboard | Bright-Market POS',
             'activePage' => 'dashboard',
+            ...$this->storeMetrics(),
+            'todaySalesCount' => (clone $todayQuery)->count(),
+            'todayRevenue' => (float) (clone $todayQuery)->sum('total_price'),
+            'recentSales' => Sale::query()
+                ->with(['product', 'customer', 'seller'])
+                ->latestLedger()
+                ->limit(5)
+                ->get(),
+        ]);
+    }
+
+    /**
+     * Gather shared catalog, directory, and ledger summary counts.
+     *
+     * @return array<string, int|float>
+     */
+    private function storeMetrics(): array
+    {
+        return [
             'productCount' => Product::query()->count(),
             'lowStockCount' => Product::query()->lowStock()->count(),
             'customerCount' => Customer::query()->count(),
             'userCount' => User::query()->count(),
             'salesCount' => Sale::query()->count(),
             'totalRevenue' => (float) Sale::query()->sum('total_price'),
-            'recentSales' => Sale::query()
-                ->with(['product', 'customer', 'seller'])
-                ->latest('created_at')
-                ->latest('id')
-                ->limit(5)
-                ->get(),
-        ]);
+        ];
     }
 }

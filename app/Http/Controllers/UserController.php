@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\LoadsRecentSales;
 use App\Http\Requests\SaveUserRequest;
 use App\Models\User;
 use App\Services\ImageUploadService;
@@ -13,8 +14,10 @@ use Throwable;
 
 class UserController extends Controller
 {
+    use LoadsRecentSales;
+
     /**
-     * Display the staff user accounts directory.
+     * Display the staff directory.
      */
     public function index(): View
     {
@@ -24,19 +27,19 @@ class UserController extends Controller
             ->get();
 
         return view('users.index', [
-            'title' => 'Staff Accounts | Bright-Market POS',
+            'title' => 'Staff | Bright-Market POS',
             'activePage' => 'users',
             'users' => $users,
         ]);
     }
 
     /**
-     * Display the form for creating a new staff user account.
+     * Display the form for creating a new staff account.
      */
     public function create(): View
     {
         return view('users.create', [
-            'title' => 'New Staff Account | Bright-Market POS',
+            'title' => 'Add Staff | Bright-Market POS',
             'activePage' => 'users',
             'user' => new User(['role' => 'Staff Member']),
             'roles' => User::ROLES,
@@ -80,16 +83,17 @@ class UserController extends Controller
     }
 
     /**
-     * Display an individual staff user account profile and role details.
+     * Display an individual staff user account profile and recent recorded sales.
      */
     public function show(User $user): View
     {
-        $user->loadCount('sales');
+        $recentSales = $this->loadRecentSalesContext($user, ['product', 'customer']);
 
         return view('users.show', [
-            'title' => $user->full_name.' | Staff | Bright-Market POS',
+            'title' => $user->full_name.' | Bright-Market POS',
             'activePage' => 'users',
             'user' => $user,
+            'recentSales' => $recentSales,
         ]);
     }
 
@@ -99,7 +103,7 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         return view('users.edit', [
-            'title' => 'Edit Staff Account | Bright-Market POS',
+            'title' => 'Edit Staff | Bright-Market POS',
             'activePage' => 'users',
             'user' => $user,
             'roles' => User::ROLES,
@@ -124,12 +128,13 @@ class UserController extends Controller
         }
 
         $avatarToPersist = $newAvatarPath ?? ($removeRequested ? null : $oldAvatar);
+        $resolvedRole = $validated['role'] ?? $user->role ?? 'Staff Member';
 
         $attributes = [
             'username' => $validated['username'],
             'full_name' => $validated['full_name'],
             'email' => $validated['email'] ?? null,
-            'role' => $validated['role'] ?? $user->role ?? 'Staff Member',
+            'role' => $resolvedRole,
             'avatar' => $avatarToPersist,
         ];
 

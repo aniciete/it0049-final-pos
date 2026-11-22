@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\LoadsRecentSales;
 use App\Http\Requests\SaveCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
@@ -9,6 +10,8 @@ use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
+    use LoadsRecentSales;
+
     /**
      * Display the customer accounts directory.
      */
@@ -32,7 +35,7 @@ class CustomerController extends Controller
     public function create(): View
     {
         return view('customers.create', [
-            'title' => 'New Customer Account | Bright-Market POS',
+            'title' => 'Add Customer | Bright-Market POS',
             'activePage' => 'customers',
             'customer' => new Customer,
         ]);
@@ -51,17 +54,11 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display an individual customer account record and order count.
+     * Display an individual customer account record and linked sales receipts.
      */
     public function show(Customer $customer): View
     {
-        $customer->loadCount('sales');
-
-        return view('customers.show', [
-            'title' => $customer->full_name.' | Customers | Bright-Market POS',
-            'activePage' => 'customers',
-            'customer' => $customer,
-        ]);
+        return $this->renderCustomerContext('customers.show', $customer->full_name.' | Bright-Market POS', $customer);
     }
 
     /**
@@ -69,10 +66,21 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer): View
     {
-        return view('customers.edit', [
-            'title' => 'Edit Customer Account | Bright-Market POS',
+        return $this->renderCustomerContext('customers.edit', 'Edit Customer | Bright-Market POS', $customer);
+    }
+
+    /**
+     * Render a customer detail or edit view with latest linked sales.
+     */
+    private function renderCustomerContext(string $view, string $title, Customer $customer): View
+    {
+        $recentSales = $this->loadRecentSalesContext($customer, ['product', 'seller']);
+
+        return view($view, [
+            'title' => $title,
             'activePage' => 'customers',
             'customer' => $customer,
+            'recentSales' => $recentSales,
         ]);
     }
 

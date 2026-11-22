@@ -21,7 +21,11 @@ class SaveUserRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $role = trim((string) $this->input('role', ''));
+        /** @var User|null $targetUser */
+        $targetUser = $this->route('user');
+        $role = $this->isEditingSelf()
+            ? (string) ($targetUser->role ?? 'Staff Member')
+            : trim((string) $this->input('role', ''));
         $email = strtolower(trim((string) $this->input('email', '')));
 
         $this->merge([
@@ -43,6 +47,7 @@ class SaveUserRequest extends FormRequest
         /** @var User|null $user */
         $user = $this->route('user');
         $isEdit = $user !== null;
+        $isSelf = $this->isEditingSelf();
 
         return [
             'username' => [
@@ -69,7 +74,9 @@ class SaveUserRequest extends FormRequest
                 'max:72',
                 'confirmed',
             ],
-            'role' => ['nullable', 'string', 'max:50', Rule::in(User::ROLES)],
+            'role' => $isSelf
+                ? ['nullable', 'string', 'max:50']
+                : ['nullable', 'string', 'max:50', Rule::in(User::ROLES)],
             'avatar' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_avatar' => ['nullable', 'boolean'],
         ];
@@ -104,5 +111,16 @@ class SaveUserRequest extends FormRequest
             'avatar.mimes' => 'Avatar must be a JPG, PNG, or WebP file.',
             'avatar.max' => 'Avatar image must not be larger than 2 MB.',
         ];
+    }
+
+    /**
+     * Determine whether the authenticated operator is updating their own account.
+     */
+    private function isEditingSelf(): bool
+    {
+        /** @var User|null $targetUser */
+        $targetUser = $this->route('user');
+
+        return $targetUser !== null && $this->user() !== null && $targetUser->is($this->user());
     }
 }
