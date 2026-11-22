@@ -82,7 +82,7 @@ class PosSalesTransactionTest extends TestCase
         $this->actingAs($staff)
             ->get(route('sales.index'))
             ->assertOk()
-            ->assertSee('Walk-in Customer');
+            ->assertSee('Walk-in');
     }
 
     public function test_insufficient_stock_rejects_sale_without_modifying_inventory_or_creating_partial_sale(): void
@@ -95,6 +95,7 @@ class PosSalesTransactionTest extends TestCase
         ]);
 
         $response = $this->actingAs($staff)
+            ->followingRedirects()
             ->from(route('sales.create'))
             ->post(route('sales.store'), [
                 'product_id' => $product->id,
@@ -102,13 +103,36 @@ class PosSalesTransactionTest extends TestCase
                 'quantity' => 4,
             ]);
 
-        $response->assertRedirect(route('sales.create'));
-        $response->assertSessionHasErrors(['quantity']);
-        $response->assertSessionHas('error', 'Insufficient stock for Raw Wildflower Honey 350g. Only 3 units available.');
+        $response->assertOk();
+        $response->assertSee('Insufficient stock for Raw Wildflower Honey 350g. Only 3 units available.');
+        $response->assertSee('Set to 3');
 
         $product->refresh();
         $this->assertSame(3, $product->stock_quantity);
         $this->assertSame(0, Sale::query()->count());
+    }
+
+    public function test_insufficient_stock_flashes_available_stock_without_duplicate_banner(): void
+    {
+        $staff = User::factory()->create();
+        $product = Product::query()->create([
+            'name' => 'Cold Pressed Olive Oil',
+            'price' => '18.00',
+            'stock_quantity' => 2,
+        ]);
+
+        $response = $this->actingAs($staff)
+            ->from(route('sales.create'))
+            ->post(route('sales.store'), [
+                'product_id' => $product->id,
+                'customer_id' => '',
+                'quantity' => 5,
+            ]);
+
+        $response->assertRedirect(route('sales.create'));
+        $response->assertSessionHasErrors(['quantity']);
+        $response->assertSessionMissing('error');
+        $response->assertSessionHas('available_stock', 2);
     }
 
     public function test_archived_product_cannot_be_sold(): void
@@ -140,6 +164,68 @@ class PosSalesTransactionTest extends TestCase
         $admin = User::query()->where('username', 'admin.reyes')->firstOrFail();
 
         $this->actingAs($admin)->get(route('dashboard'))->assertOk()->assertSee('Operations Dashboard');
-        $this->actingAs($admin)->get(route('sales.index'))->assertOk()->assertSee('Walk-in Customer');
+        $this->actingAs($admin)->get(route('sales.index'))->assertOk()->assertSee('Walk-in');
+    }
+
+    public function test_sales_receipt_page_and_ledger_filters_work_correctly(): void
+    {
+        $cashierA = User::factory()->create(['full_name' => 'Cashier Alpha', 'username' => 'cashier.alpha']);
+        $cashierB = User::factory()->create(['full_name' => 'Cashier Beta', 'username' => 'cashier.beta']);
+
+        $beans = Product::query()->create(['name' => 'Filter Beans', 'price' => '12.00', 'stock_quantity' => 10]);
+        $matcha = Product::query()->create(['name' => 'Ceremonial Matcha', 'price' => '18.50', 'stock_quantity' => 10]);
+
+        $saleA = Sale::query()->create([
+            'product_id' => $beans->id,
+            'customer_id' => null,
+            'sold_by' => $cashierA->id,
+            'quantity' => 2,
+            'total_price' => '24.00',
+        ]);
+        $saleB = Sale::query()->create([
+            'product_id' => $matcha->id,
+            'customer_id' => null,
+            'sold_by' => $cashierB->id,
+            'quantity' => 1,
+            'total_price' => '18.50',
+        ]);
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.show', $saleA))
+            ->assertOk()
+            ->assertSee('Receipt')
+            ->assertSee('#'.$saleA->id)
+            ->assertSee('Filter Beans')
+            ->assertSee('$24.00')
+            ->assertSee('Cashier Alpha');
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.index', ['q' => 'Matcha']))
+            ->assertOk()
+            ->assertSee('Ceremonial Matcha')
+            ->assertDontSee('Filter Beans');
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.index', ['staff' => $cashierA->id]))
+            ->assertOk()
+            ->assertSee('Filter Beans')
+            ->assertDontSee('Ceremonial Matcha');
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.index', ['q' => '#'.$saleB->id]))
+            ->assertOk()
+            ->assertSee('Ceremonial Matcha')
+            ->assertDontSee('Filter Beans');
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.index', ['from' => 'today', 'to' => 'invalid-date']))
+            ->assertOk()
+            ->assertSee('Filter Beans')
+            ->assertSee('Ceremonial Matcha');
+
+        $this->actingAs($cashierA)
+            ->get(route('sales.index', ['from' => now()->addDay()->toDateString()]))
+            ->assertOk()
+            ->assertSee('No Matching Sales Found');
     }
 }

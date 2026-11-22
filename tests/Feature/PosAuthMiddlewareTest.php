@@ -52,7 +52,7 @@ class PosAuthMiddlewareTest extends TestCase
         $this->assertGuest();
 
         $this->post('/login', [
-            'login' => 'admin.reyes@brightmarket.test',
+            'login' => 'admin.reyes@brightmarket.ph',
             'password' => 'POSDemo!2026',
         ])->assertRedirect(route('dashboard', absolute: false));
 

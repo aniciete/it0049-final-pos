@@ -129,4 +129,27 @@ class PosCustomerAndStaffTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $created->id]);
         Storage::disk('public')->assertMissing($avatarPath);
     }
+
+    public function test_staff_user_cannot_change_their_own_role(): void
+    {
+        $admin = User::factory()->create([
+            'username' => 'admin.self',
+            'full_name' => 'Self Admin',
+            'email' => 'self.admin@brightmarket.ph',
+            'role' => 'Store Admin',
+        ]);
+
+        $this->actingAs($admin)->put(route('users.update', $admin), [
+            'username' => 'admin.self',
+            'full_name' => 'Self Admin Updated',
+            'email' => 'self.admin@brightmarket.ph',
+            'role' => 'Staff Member',
+            'password' => '',
+            'password_confirmation' => '',
+        ])->assertRedirect(route('users.index'));
+
+        $admin->refresh();
+        $this->assertSame('Self Admin Updated', $admin->full_name);
+        $this->assertSame('Store Admin', $admin->role);
+    }
 }

@@ -180,15 +180,15 @@ if ($dbHost !== '' && $dbName !== '' && $dbUser !== '' && file_exists($sqlFile))
                 echo "SUCCESS: Imported MySQL schema and initial seed data into {$dbName} via {$tryHost}.\n";
             } else {
                 $seedUsers = [
-                    'admin.reyes' => 'avatars/admin.reyes.jpg',
-                    'mgr.castro' => 'avatars/mgr.castro.jpg',
-                    'cashier.valdez' => 'avatars/cashier.valdez.jpg',
-                    'cashier.santos' => 'avatars/cashier.santos.jpg',
-                    'inv.navarro' => 'avatars/inv.navarro.jpg',
+                    'admin.reyes' => ['avatars/admin.reyes.jpg', 'admin.reyes@brightmarket.ph'],
+                    'mgr.castro' => ['avatars/mgr.castro.jpg', 'mgr.castro@brightmarket.ph'],
+                    'cashier.valdez' => ['avatars/cashier.valdez.jpg', 'cashier.valdez@brightmarket.ph'],
+                    'cashier.santos' => ['avatars/cashier.santos.jpg', 'cashier.santos@brightmarket.ph'],
+                    'inv.navarro' => ['avatars/inv.navarro.jpg', 'inv.navarro@brightmarket.ph'],
                 ];
-                $userStmt = $pdo->prepare('UPDATE `users` SET `avatar` = :avatar WHERE `username` = :username AND (`avatar` IS NULL OR `avatar` LIKE :testPrefix)');
-                foreach ($seedUsers as $uname => $avatarRel) {
-                    $userStmt->execute(['avatar' => $avatarRel, 'username' => $uname, 'testPrefix' => 'avatars/%.png']);
+                $userStmt = $pdo->prepare('UPDATE `users` SET `avatar` = :avatar, `email` = :email WHERE `username` = :username');
+                foreach ($seedUsers as $uname => [$avatarRel, $staffEmail]) {
+                    $userStmt->execute(['avatar' => $avatarRel, 'email' => $staffEmail, 'username' => $uname]);
                 }
 
                 $seedProducts = [
