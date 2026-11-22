@@ -72,6 +72,13 @@ mkdir -p "$TMP_DIR/storage/app/public/avatars" \
          "$TMP_DIR/storage/logs" \
          "$TMP_DIR/bootstrap/cache"
 
+if [ -d "$DIR/database/seeders/media/avatars" ]; then
+    cp -r "$DIR/database/seeders/media/avatars/"* "$TMP_DIR/storage/app/public/avatars/"
+fi
+if [ -d "$DIR/database/seeders/media/products" ]; then
+    cp -r "$DIR/database/seeders/media/products/"* "$TMP_DIR/storage/app/public/products/"
+fi
+
 cd "$TMP_DIR"
 composer install --no-dev --optimize-autoloader --no-interaction --quiet
 

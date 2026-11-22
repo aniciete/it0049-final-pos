@@ -81,11 +81,11 @@ CREATE TABLE IF NOT EXISTS `sales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `users` (`id`, `username`, `full_name`, `email`, `email_verified_at`, `password`, `role`, `avatar`, `created_at`, `updated_at`) VALUES
-(1, 'admin.reyes', 'Carlos Reyes', 'admin.reyes@brightmarket.test', '2026-01-15 08:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Store Administrator', NULL, '2026-01-15 08:00:00', '2026-01-15 08:00:00'),
-(2, 'mgr.castro', 'Beatriz Castro', 'mgr.castro@brightmarket.test', '2026-01-20 08:30:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Shift Supervisor', NULL, '2026-01-20 08:30:00', '2026-01-20 08:30:00'),
-(3, 'cashier.valdez', 'Daniel Valdez', 'cashier.valdez@brightmarket.test', '2026-02-01 09:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', NULL, '2026-02-01 09:00:00', '2026-02-01 09:00:00'),
-(4, 'cashier.santos', 'Camille Santos', 'cashier.santos@brightmarket.test', '2026-02-01 09:15:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', NULL, '2026-02-01 09:15:00', '2026-02-01 09:15:00'),
-(5, 'inv.navarro', 'Leo Navarro', 'inv.navarro@brightmarket.test', '2026-02-10 10:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Inventory Clerk', NULL, '2026-02-10 10:00:00', '2026-02-10 10:00:00');
+(1, 'admin.reyes', 'Carlos Reyes', 'admin.reyes@brightmarket.test', '2026-01-15 08:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Store Administrator', 'avatars/admin.reyes.jpg', '2026-01-15 08:00:00', '2026-01-15 08:00:00'),
+(2, 'mgr.castro', 'Beatriz Castro', 'mgr.castro@brightmarket.test', '2026-01-20 08:30:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Shift Supervisor', 'avatars/mgr.castro.jpg', '2026-01-20 08:30:00', '2026-01-20 08:30:00'),
+(3, 'cashier.valdez', 'Daniel Valdez', 'cashier.valdez@brightmarket.test', '2026-02-01 09:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.valdez.jpg', '2026-02-01 09:00:00', '2026-02-01 09:00:00'),
+(4, 'cashier.santos', 'Camille Santos', 'cashier.santos@brightmarket.test', '2026-02-01 09:15:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.santos.jpg', '2026-02-01 09:15:00', '2026-02-01 09:15:00'),
+(5, 'inv.navarro', 'Leo Navarro', 'inv.navarro@brightmarket.test', '2026-02-10 10:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Inventory Clerk', 'avatars/inv.navarro.jpg', '2026-02-10 10:00:00', '2026-02-10 10:00:00');
 
 INSERT INTO `customers` (`id`, `full_name`, `email`, `phone`, `created_at`, `updated_at`) VALUES
 (1, 'Teresa Mendoza', 'teresa.mendoza@gmail.com', '+63 917 482 1930', '2026-03-01 08:30:00', '2026-03-01 08:30:00'),
@@ -95,14 +95,14 @@ INSERT INTO `customers` (`id`, `full_name`, `email`, `phone`, `created_at`, `upd
 (5, 'Lorna Bautista', 'lorna.bautista@outlook.ph', '+63 919 740 2816', '2026-03-05 16:05:00', '2026-03-05 16:05:00');
 
 INSERT INTO `products` (`id`, `name`, `price`, `stock_quantity`, `image`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Artisan Cold Brew Bottle', 4.50, 24, NULL, '2026-03-01 07:30:00', '2026-03-01 07:30:00', NULL),
-(2, 'Sourdough Country Loaf', 6.75, 14, NULL, '2026-03-01 07:35:00', '2026-03-01 07:35:00', NULL),
-(3, 'Organic Whole Milk 1L', 3.80, 18, NULL, '2026-03-01 07:40:00', '2026-03-01 07:40:00', NULL),
-(4, 'Roasted Arabica Beans 250g', 14.50, 9, NULL, '2026-03-02 08:00:00', '2026-03-02 08:00:00', NULL),
-(5, 'Raw Wildflower Honey 350g', 11.25, 3, NULL, '2026-03-02 08:10:00', '2026-03-02 08:10:00', NULL),
-(6, 'Sea Salt Dark Chocolate Bar', 4.25, 22, NULL, '2026-03-03 08:20:00', '2026-03-03 08:20:00', NULL),
-(7, 'Extra Virgin Olive Oil 500ml', 16.90, 5, NULL, '2026-03-03 08:30:00', '2026-03-03 08:30:00', NULL),
-(8, 'Heirloom Tomato Crate 1kg', 5.40, 0, NULL, '2026-03-04 08:45:00', '2026-03-04 08:45:00', NULL);
+(1, 'Artisan Cold Brew Bottle', 4.50, 24, 'products/cold-brew.jpg', '2026-03-01 07:30:00', '2026-03-01 07:30:00', NULL),
+(2, 'Sourdough Country Loaf', 6.75, 14, 'products/sourdough.jpg', '2026-03-01 07:35:00', '2026-03-01 07:35:00', NULL),
+(3, 'Organic Whole Milk 1L', 3.80, 18, 'products/whole-milk.jpg', '2026-03-01 07:40:00', '2026-03-01 07:40:00', NULL),
+(4, 'Roasted Arabica Beans 250g', 14.50, 9, 'products/arabica-beans.jpg', '2026-03-02 08:00:00', '2026-03-02 08:00:00', NULL),
+(5, 'Raw Wildflower Honey 350g', 11.25, 3, 'products/wildflower-honey.jpg', '2026-03-02 08:10:00', '2026-03-02 08:10:00', NULL),
+(6, 'Sea Salt Dark Chocolate Bar', 4.25, 22, 'products/dark-chocolate.jpg', '2026-03-03 08:20:00', '2026-03-03 08:20:00', NULL),
+(7, 'Extra Virgin Olive Oil 500ml', 16.90, 5, 'products/olive-oil.jpg', '2026-03-03 08:30:00', '2026-03-03 08:30:00', NULL),
+(8, 'Heirloom Tomato Crate 1kg', 5.40, 0, 'products/heirloom-tomatoes.jpg', '2026-03-04 08:45:00', '2026-03-04 08:45:00', NULL);
 
 INSERT INTO `sales` (`id`, `product_id`, `customer_id`, `sold_by`, `quantity`, `total_price`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, 3, 2, 9.00, '2026-03-10 09:15:00', '2026-03-10 09:15:00'),

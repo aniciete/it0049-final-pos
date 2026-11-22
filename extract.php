@@ -179,7 +179,34 @@ if ($dbHost !== '' && $dbName !== '' && $dbUser !== '' && file_exists($sqlFile))
                 }
                 echo "SUCCESS: Imported MySQL schema and initial seed data into {$dbName} via {$tryHost}.\n";
             } else {
-                echo "NOTICE: Existing MySQL tables already present on {$tryHost}; preserved live data.\n";
+                $seedUsers = [
+                    'admin.reyes' => 'avatars/admin.reyes.jpg',
+                    'mgr.castro' => 'avatars/mgr.castro.jpg',
+                    'cashier.valdez' => 'avatars/cashier.valdez.jpg',
+                    'cashier.santos' => 'avatars/cashier.santos.jpg',
+                    'inv.navarro' => 'avatars/inv.navarro.jpg',
+                ];
+                $userStmt = $pdo->prepare('UPDATE `users` SET `avatar` = :avatar WHERE `username` = :username AND (`avatar` IS NULL OR `avatar` LIKE :testPrefix)');
+                foreach ($seedUsers as $uname => $avatarRel) {
+                    $userStmt->execute(['avatar' => $avatarRel, 'username' => $uname, 'testPrefix' => 'avatars/%.png']);
+                }
+
+                $seedProducts = [
+                    'Artisan Cold Brew Bottle' => 'products/cold-brew.jpg',
+                    'Sourdough Country Loaf' => 'products/sourdough.jpg',
+                    'Organic Whole Milk 1L' => 'products/whole-milk.jpg',
+                    'Roasted Arabica Beans 250g' => 'products/arabica-beans.jpg',
+                    'Raw Wildflower Honey 350g' => 'products/wildflower-honey.jpg',
+                    'Sea Salt Dark Chocolate Bar' => 'products/dark-chocolate.jpg',
+                    'Extra Virgin Olive Oil 500ml' => 'products/olive-oil.jpg',
+                    'Heirloom Tomato Crate 1kg' => 'products/heirloom-tomatoes.jpg',
+                ];
+                $prodStmt = $pdo->prepare('UPDATE `products` SET `image` = :image WHERE `name` = :name AND (`image` IS NULL OR `image` LIKE :testPrefix)');
+                foreach ($seedProducts as $pname => $imgRel) {
+                    $prodStmt->execute(['image' => $imgRel, 'name' => $pname, 'testPrefix' => 'products/%.png']);
+                }
+
+                echo "NOTICE: Existing MySQL tables preserved on {$tryHost}; synced curated seed media.\n";
             }
             $mysqlSuccess = true;
             break;
