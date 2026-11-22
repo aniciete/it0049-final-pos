@@ -119,29 +119,53 @@ $appUrl = $env['APP_URL'] ?? '';
 
 $mysqlSuccess = false;
 if ($dbHost !== '' && $dbName !== '' && $dbUser !== '' && file_exists($sqlFile)) {
-    try {
-        $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
-        $pdo = new PDO($dsn, $dbUser, $dbPass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => 10,
-        ]);
-
-        $existingSales = $pdo->query("SHOW TABLES LIKE 'sales'")->fetchColumn();
-        if ($existingSales === false) {
-            $sqlContent = (string) file_get_contents($sqlFile);
-            $statements = array_filter(array_map('trim', explode(';', $sqlContent)));
-            foreach ($statements as $stmt) {
-                if ($stmt !== '' && ! preg_match('/^(--|\/\*)/', $stmt)) {
-                    $pdo->exec($stmt);
-                }
-            }
-            echo "SUCCESS: Imported MySQL schema and initial seed data into {$dbName}.\n";
-        } else {
-            echo "NOTICE: Existing MySQL tables already present; preserved live data.\n";
+    $candidateHosts = [$dbHost];
+    if (preg_match('/^sql\d+/', $dbHost, $m)) {
+        $prefix = $m[0];
+        $candidateHosts[] = $prefix.'.infinityfree.com';
+        for ($i = 0; $i <= 9; $i++) {
+            $candidateHosts[] = $prefix.$i.'.infinityfree.com';
         }
-        $mysqlSuccess = true;
-    } catch (Throwable $e) {
-        echo 'NOTICE: MySQL initialization failed ('.$e->getMessage()."). Falling back to SQLite.\n";
+    }
+    $candidateHosts = array_values(array_unique($candidateHosts));
+
+    $lastError = null;
+    foreach ($candidateHosts as $tryHost) {
+        try {
+            $dsn = "mysql:host={$tryHost};dbname={$dbName};charset=utf8mb4";
+            $pdo = new PDO($dsn, $dbUser, $dbPass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 3,
+            ]);
+
+            if ($tryHost !== $dbHost && file_exists($envFile)) {
+                $envContent = (string) file_get_contents($envFile);
+                $envContent = preg_replace('/^DB_HOST=.*/m', 'DB_HOST='.$tryHost, $envContent);
+                file_put_contents($envFile, $envContent);
+            }
+
+            $existingSales = $pdo->query("SHOW TABLES LIKE 'sales'")->fetchColumn();
+            if ($existingSales === false) {
+                $sqlContent = (string) file_get_contents($sqlFile);
+                $statements = array_filter(array_map('trim', explode(';', $sqlContent)));
+                foreach ($statements as $stmt) {
+                    if ($stmt !== '' && ! preg_match('/^(--|\/\*)/', $stmt)) {
+                        $pdo->exec($stmt);
+                    }
+                }
+                echo "SUCCESS: Imported MySQL schema and initial seed data into {$dbName} via {$tryHost}.\n";
+            } else {
+                echo "NOTICE: Existing MySQL tables already present on {$tryHost}; preserved live data.\n";
+            }
+            $mysqlSuccess = true;
+            break;
+        } catch (Throwable $e) {
+            $lastError = $e->getMessage();
+        }
+    }
+
+    if (! $mysqlSuccess && $lastError !== null) {
+        echo 'NOTICE: MySQL initialization failed ('.$lastError."). Falling back to SQLite.\n";
     }
 }
 
