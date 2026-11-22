@@ -11,7 +11,7 @@
         @csrf
         @method('PATCH')
 
-        <div class="form-grid">
+        <div class="form-row-two">
             <div class="form-group">
                 <label for="name" class="form-label">Full Name</label>
                 <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">

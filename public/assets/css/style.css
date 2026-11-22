@@ -2285,6 +2285,12 @@ select.form-control::picker-icon {
     max-width: 720px;
 }
 
+.profile-column {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
+}
+
 .table-link {
     color: var(--ink-primary);
     font-weight: 600;

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Product;
+use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -93,6 +95,37 @@ class ProfileTest extends TestCase
         $response
             ->assertSessionHasErrorsIn('userDeletion', 'password')
             ->assertRedirect('/profile');
+
+        $this->assertNotNull($user->fresh());
+    }
+
+    public function test_profile_locks_account_deletion_ui_and_endpoint_when_user_has_sales(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::query()->create([
+            'name' => 'House Blend',
+            'price' => '5.00',
+            'stock_quantity' => 10,
+        ]);
+        Sale::query()->create([
+            'product_id' => $product->id,
+            'customer_id' => null,
+            'sold_by' => $user->id,
+            'quantity' => 1,
+            'total_price' => '5.00',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertOk()
+            ->assertSee('Account deletion is locked')
+            ->assertDontSee('id="delete_account_password"', false)
+            ->assertDontSee('Delete Your Account');
+
+        $this->actingAs($user)
+            ->delete('/profile', ['password' => 'password'])
+            ->assertRedirect('/profile')
+            ->assertSessionHas('error');
 
         $this->assertNotNull($user->fresh());
     }
