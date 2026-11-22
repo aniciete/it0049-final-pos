@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
         abort_unless($disk->exists($path), 404);
 
         $fullPath = $disk->path($path);
+        abort_unless(is_file($fullPath), 404);
         $mtime = @filemtime($fullPath) ?: time();
         $size = @filesize($fullPath) ?: 0;
         $etag = '"'.md5($path.'|'.$mtime.'|'.$size).'"';

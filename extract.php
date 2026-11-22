@@ -207,6 +207,8 @@ if ($dbHost !== '' && $dbName !== '' && $dbUser !== '' && file_exists($sqlFile))
                     $prodStmt->execute(['image' => $imgRel, 'name' => $pname, 'testPrefix' => 'products/%.png']);
                 }
 
+                $pdo->exec("DELETE FROM `customers` WHERE `email` LIKE '%.example.test' AND `id` NOT IN (SELECT DISTINCT `customer_id` FROM `sales` WHERE `customer_id` IS NOT NULL)");
+
                 echo "NOTICE: Existing MySQL tables preserved on {$tryHost}; synced curated seed media.\n";
             }
             $mysqlSuccess = true;

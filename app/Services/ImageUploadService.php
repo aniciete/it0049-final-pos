@@ -27,14 +27,10 @@ class ImageUploadService
     public function storeResized(UploadedFile $file, string $directory, int $dimension): string
     {
         $extension = $this->resolveSafeExtension($file);
-        $folder = trim($directory, '/');
-        $filename = Str::uuid().'.'.$extension;
-        $relativePath = $folder.'/'.$filename;
+        $relativePath = trim($directory, '/').'/'.Str::uuid().'.'.$extension;
+        $image = Image::decode($file->get());
 
-        $image = Image::decode($file->get())
-            ->cover($dimension, $dimension);
-
-        Storage::disk('public')->put($relativePath, $this->encodeForExtension($image, $extension, 85));
+        $this->storeSquareDerivative($image, $relativePath, $dimension, $extension, 85);
 
         return $relativePath;
     }
@@ -55,16 +51,26 @@ class ImageUploadService
         $extension = $this->resolveSafeExtension($file);
         $filename = Str::uuid().'.'.$extension;
         $relativePath = 'products/'.$filename;
+        $image = Image::decode($file->get());
 
-        $image = Image::decode($file->get())
-            ->cover(self::PRODUCT_DIMENSION, self::PRODUCT_DIMENSION);
-
-        Storage::disk('public')->put($relativePath, $this->encodeForExtension($image, $extension, 85));
-
-        $thumb = $image->cover(self::PRODUCT_THUMB_DIMENSION, self::PRODUCT_THUMB_DIMENSION);
-        Storage::disk('public')->put('products/thumbs/'.$filename, $this->encodeForExtension($thumb, $extension, 82));
+        $this->storeSquareDerivative($image, $relativePath, self::PRODUCT_DIMENSION, $extension, 85);
+        $this->storeSquareDerivative($image, 'products/thumbs/'.$filename, self::PRODUCT_THUMB_DIMENSION, $extension, 82);
 
         return $relativePath;
+    }
+
+    /**
+     * Crop/resize a decoded image to a square dimension and persist it onto the public disk.
+     */
+    private function storeSquareDerivative(
+        ImageInterface $image,
+        string $relativePath,
+        int $dimension,
+        string $extension,
+        int $quality,
+    ): void {
+        $resized = $image->cover($dimension, $dimension);
+        Storage::disk('public')->put($relativePath, $this->encodeForExtension($resized, $extension, $quality));
     }
 
     /**

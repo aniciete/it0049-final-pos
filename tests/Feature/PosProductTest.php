@@ -68,6 +68,10 @@ class PosProductTest extends TestCase
             ->withHeaders(['If-None-Match' => $etag])
             ->get(route('media.thumb', ['folder' => 'products', 'filename' => basename($product->image)]))
             ->assertStatus(304);
+
+        $this->actingAs($staff)
+            ->get('/media/products/thumbs')
+            ->assertNotFound();
     }
 
     public function test_product_validation_rejects_invalid_image_and_retains_old_input(): void
