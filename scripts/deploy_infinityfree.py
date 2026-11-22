@@ -3,15 +3,15 @@
 Automated FTPS Deployment for Bright-Market Laravel POS to InfinityFree.
 Reads credentials from environment variables or gitignored .deploy.env / .env.production,
 builds the lean zip, and uploads it0049-final-pos-infinityfree.zip, extract.php, and a
-one-time .extract_token over FTPS.
+one-time .extract_token over FTPS using curl (TLS 1.3 session reuse + generous timeout).
 """
 
-import ftplib
-import io
 import os
 import secrets
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,69 +63,71 @@ def build_package() -> None:
         raise RuntimeError("Build script failed.")
 
 
+def curl_upload(creds: dict[str, str], local_file: Path, remote_name: str) -> None:
+    url = f"ftp://{creds['FTP_HOST']}:{creds['FTP_PORT']}/htdocs/{remote_name}"
+    config_text = f'user = "{creds["FTP_USER"]}:{creds["FTP_PASS"]}"\n'
+    res = subprocess.run(
+        [
+            "curl",
+            "--fail",
+            "--show-error",
+            "--silent",
+            "--ssl-reqd",
+            "--ftp-pasv",
+            "--max-time",
+            "600",
+            "--config",
+            "-",
+            "-T",
+            str(local_file),
+            url,
+        ],
+        input=config_text,
+        text=True,
+    )
+    if res.returncode != 0:
+        raise RuntimeError(f"FTPS upload failed for {remote_name} (curl exit {res.returncode}).")
+
+
 def deploy() -> None:
+    if not shutil.which("curl"):
+        raise RuntimeError("curl is required for FTPS deployment.")
+
     creds = load_credentials()
     build_package()
-
-    host = creds["FTP_HOST"]
-    port = int(creds["FTP_PORT"])
-    user = creds["FTP_USER"]
-    password = creds["FTP_PASS"]
-    app_url = creds["APP_URL"]
-    allow_insecure = os.getenv("ALLOW_INSECURE_FTP") == "1"
 
     if not ZIP_PATH.exists() or not EXTRACT_PHP.exists():
         raise RuntimeError("Deployment artifacts missing.")
 
-    print(f"Connecting to FTPS {host}:{port} as {user} ...")
+    token = secrets.token_urlsafe(24)
 
-    ftp: ftplib.FTP | None = None
+    with tempfile.NamedTemporaryFile("w", encoding="ascii", delete=False) as tmp:
+        tmp.write(token)
+        token_tmp_path = Path(tmp.name)
+
     try:
-        try:
-            ftps = ftplib.FTP_TLS(timeout=30)
-            ftps.connect(host, port)
-            ftps.auth()
-            ftps.prot_p()
-            ftps.login(user, password)
-            ftp = ftps
-            print("FTPS (TLS) connected and authenticated.")
-        except Exception as tls_exc:
-            if not allow_insecure:
-                raise RuntimeError(
-                    f"FTPS TLS connection failed ({tls_exc}). Refusing cleartext FTP fallback without ALLOW_INSECURE_FTP=1."
-                ) from tls_exc
-            plain = ftplib.FTP(timeout=30)
-            plain.connect(host, port)
-            plain.login(user, password)
-            ftp = plain
-
-        ftp.set_pasv(True)
-        ftp.cwd("/htdocs")
-
         htaccess_path = BASE_DIR / ".htaccess"
         if htaccess_path.exists():
-            with htaccess_path.open("rb") as f:
-                ftp.storbinary("STOR .htaccess", f)
+            print("==> Uploading .htaccess ...")
+            curl_upload(creds, htaccess_path, ".htaccess")
 
-        token = secrets.token_urlsafe(24)
-        ftp.storbinary("STOR .extract_token", io.BytesIO(token.encode("ascii")))
+        print("==> Uploading one-time .extract_token ...")
+        curl_upload(creds, token_tmp_path, ".extract_token")
 
-        with ZIP_PATH.open("rb") as f:
-            ftp.storbinary(f"STOR {ZIP_PATH.name}", f, blocksize=262144)
+        size_mb = ZIP_PATH.stat().st_size / (1024 * 1024)
+        print(f"==> Uploading {ZIP_PATH.name} ({size_mb:.2f} MB) via FTPS ...")
+        curl_upload(creds, ZIP_PATH, ZIP_PATH.name)
 
-        with EXTRACT_PHP.open("rb") as f:
-            ftp.storbinary("STOR extract.php", f)
-
-        print("\n========================================================")
-        print(" DEPLOYMENT UPLOAD COMPLETE")
-        print(f" Next step: Trigger extraction at {app_url}/extract.php?token={token}")
-        print("========================================================")
+        print("==> Uploading extract.php ...")
+        curl_upload(creds, EXTRACT_PHP, "extract.php")
     finally:
-        if ftp is not None:
-            try:
-                ftp.quit()
-            except Exception:
-                pass
+        token_tmp_path.unlink(missing_ok=True)
+
+    app_url = creds["APP_URL"]
+    print("\n========================================================")
+    print(" DEPLOYMENT UPLOAD COMPLETE")
+    print(f" Next step: Trigger extraction at {app_url}/extract.php?token={token}")
+    print("========================================================")
 
 
 if __name__ == "__main__":
