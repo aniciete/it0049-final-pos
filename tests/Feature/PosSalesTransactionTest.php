@@ -170,7 +170,7 @@ class PosSalesTransactionTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $admin = User::query()->where('username', 'admin.reyes')->firstOrFail();
 
-        $this->actingAs($admin)->get(route('dashboard'))->assertOk()->assertSee('Operations Dashboard');
+        $this->actingAs($admin)->get(route('dashboard'))->assertOk()->assertSee('Dashboard');
         $this->actingAs($admin)->get(route('sales.index'))->assertOk()->assertSee('Walk-in');
     }
 
@@ -201,6 +201,9 @@ class PosSalesTransactionTest extends TestCase
             ->get(route('sales.show', $saleA))
             ->assertOk()
             ->assertSee('Receipt')
+            ->assertSee('Print Receipt')
+            ->assertDontSee('Receipt Number')
+            ->assertDontSee('Transaction Date')
             ->assertSee('#'.$saleA->id)
             ->assertSee('Filter Beans')
             ->assertSee('$24.00')

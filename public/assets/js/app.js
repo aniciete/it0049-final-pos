@@ -646,6 +646,14 @@
         render();
     }
 
+    function initPrintReceipt() {
+        document.querySelectorAll('[data-print-receipt]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                window.print();
+            });
+        });
+    }
+
     initResponsiveNavbar();
     initFlashDismiss();
     initConfirmDialog();
@@ -655,4 +663,5 @@
     initProductPreview();
     initSalePreview();
     initDemoLoginFill();
+    initPrintReceipt();
 })();

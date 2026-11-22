@@ -41,7 +41,7 @@ class PageController extends Controller
         $todayQuery = Sale::query()->whereDate('created_at', today());
 
         return view('dashboard', [
-            'title' => 'Operations Dashboard | Bright-Market POS',
+            'title' => 'Dashboard | Bright-Market POS',
             'activePage' => 'dashboard',
             ...$this->storeMetrics(),
             'todaySalesCount' => (clone $todayQuery)->count(),

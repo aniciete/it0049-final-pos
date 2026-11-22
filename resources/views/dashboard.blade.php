@@ -4,7 +4,7 @@
 <div class="container">
     <header class="directory-header">
         <div>
-            <h1 class="page-title">Operations Dashboard</h1>
+            <h1 class="page-title">Dashboard</h1>
             <p class="page-lead">
                 Today: <span class="mono-num">{{ $todaySalesCount }}</span> {{ \Illuminate\Support\Str::plural('sale', $todaySalesCount) }}
                 (<span class="mono-num">${{ number_format($todayRevenue, 2) }}</span>)
@@ -62,7 +62,7 @@
             </div>
         @else
             <div class="table-wrapper" tabindex="0" role="region" aria-label="Recent sales transactions">
-                <table class="data-table">
+                <table class="data-table ledger-mobile-compact">
                     <thead>
                         <tr>
                             <th scope="col" class="num-col">Receipt</th>
@@ -78,15 +78,29 @@
                         @foreach ($recentSales as $sale)
                             <tr>
                                 <td class="num-col mono-num" data-label="Receipt">
-                                    <a href="{{ route('sales.show', $sale) }}" class="table-link">#{{ $sale->id }}</a>
+                                    <a href="{{ route('sales.show', $sale) }}" class="table-link ledger-receipt-link">#{{ $sale->id }}</a>
                                 </td>
                                 <td data-label="Product">
-                                    <span class="cell-product-title">{{ $sale->product?->name ?? 'Removed Product' }}</span>
+                                    @if ($sale->product)
+                                        <a href="{{ route('products.show', $sale->product_id) }}" class="cell-product-title table-link">{{ $sale->product->name }}</a>
+                                    @else
+                                        <span class="cell-product-title">Removed Product</span>
+                                    @endif
                                 </td>
                                 <td data-label="Customer">
-                                    {{ $sale->customer?->full_name ?? 'Walk-in' }}
+                                    @if ($sale->customer)
+                                        <a href="{{ route('customers.show', $sale->customer) }}" class="cell-primary table-link">{{ $sale->customer->full_name }}</a>
+                                    @else
+                                        <span class="cell-muted">Walk-in</span>
+                                    @endif
                                 </td>
-                                <td data-label="Staff Member">{{ $sale->seller?->full_name ?? 'System' }}</td>
+                                <td data-label="Staff Member">
+                                    @if ($sale->seller)
+                                        <a href="{{ route('users.show', $sale->seller) }}" class="cell-primary table-link">{{ $sale->seller->full_name }}</a>
+                                    @else
+                                        <span class="cell-muted">System</span>
+                                    @endif
+                                </td>
                                 <td class="num-col mono-num" data-label="Qty">{{ $sale->quantity }}</td>
                                 <td class="num-col mono-num" data-label="Total Price">${{ number_format((float) $sale->total_price, 2) }}</td>
                                 <td class="mono-num" data-label="Transaction Date">{{ $sale->created_at?->format('M j, Y g:i A') }}</td>
