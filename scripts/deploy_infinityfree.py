@@ -18,7 +18,7 @@ ZIP_PATH = BASE_DIR / "it0049-final-pos-infinityfree.zip"
 EXTRACT_PHP = BASE_DIR / "extract.php"
 DEPLOY_ENV = BASE_DIR / ".deploy.env"
 ENV_PROD = BASE_DIR / ".env.production"
-CHUNK_SIZE_BYTES = 3 * 1024 * 1024  # 3 MB chunks
+CHUNK_SIZE_BYTES = 1536 * 1024  # 1.5 MB chunks
 
 
 def parse_dotenv(path: Path) -> dict[str, str]:
@@ -75,7 +75,7 @@ def curl_upload(creds: dict[str, str], local_file: Path, remote_name: str) -> No
             "--ssl-reqd",
             "--ftp-pasv",
             "--max-time",
-            "180",
+            "300",
             "--config",
             "-",
             "-T",
@@ -116,7 +116,7 @@ def deploy() -> None:
 
         total_bytes = ZIP_PATH.stat().st_size
         size_mb = total_bytes / (1024 * 1024)
-        print(f"==> Splitting {ZIP_PATH.name} ({size_mb:.2f} MB) into 3 MB FTPS chunks ...")
+        print(f"==> Splitting {ZIP_PATH.name} ({size_mb:.2f} MB) into 1.5 MB FTPS chunks ...")
 
         with ZIP_PATH.open("rb") as src:
             idx = 0

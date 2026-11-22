@@ -27,6 +27,7 @@ rsync -av \
   --exclude="scripts" \
   --exclude="env.production.example" \
   --exclude="public/storage" \
+  --exclude="database/seeders/media" \
   "$DIR/" "$TMP_DIR/" > /dev/null
 
 [ -f "$DIR/.htaccess" ] && cp "$DIR/.htaccess" "$TMP_DIR/.htaccess"
