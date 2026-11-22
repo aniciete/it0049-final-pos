@@ -81,11 +81,11 @@ CREATE TABLE IF NOT EXISTS `sales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `users` (`id`, `username`, `full_name`, `email`, `email_verified_at`, `password`, `role`, `avatar`, `created_at`, `updated_at`) VALUES
-(1, 'admin.reyes', 'Carlos Reyes', 'admin.reyes@brightmarket.test', '2026-01-15 08:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Store Administrator', 'avatars/admin.reyes.jpg', '2026-01-15 08:00:00', '2026-01-15 08:00:00'),
-(2, 'mgr.castro', 'Beatriz Castro', 'mgr.castro@brightmarket.test', '2026-01-20 08:30:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Shift Supervisor', 'avatars/mgr.castro.jpg', '2026-01-20 08:30:00', '2026-01-20 08:30:00'),
-(3, 'cashier.valdez', 'Daniel Valdez', 'cashier.valdez@brightmarket.test', '2026-02-01 09:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.valdez.jpg', '2026-02-01 09:00:00', '2026-02-01 09:00:00'),
-(4, 'cashier.santos', 'Camille Santos', 'cashier.santos@brightmarket.test', '2026-02-01 09:15:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.santos.jpg', '2026-02-01 09:15:00', '2026-02-01 09:15:00'),
-(5, 'inv.navarro', 'Leo Navarro', 'inv.navarro@brightmarket.test', '2026-02-10 10:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Inventory Clerk', 'avatars/inv.navarro.jpg', '2026-02-10 10:00:00', '2026-02-10 10:00:00');
+(1, 'admin.reyes', 'Carlos Reyes', 'admin.reyes@brightmarket.ph', '2026-01-15 08:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Store Administrator', 'avatars/admin.reyes.jpg', '2026-01-15 08:00:00', '2026-01-15 08:00:00'),
+(2, 'mgr.castro', 'Beatriz Castro', 'mgr.castro@brightmarket.ph', '2026-01-20 08:30:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Shift Supervisor', 'avatars/mgr.castro.jpg', '2026-01-20 08:30:00', '2026-01-20 08:30:00'),
+(3, 'cashier.valdez', 'Daniel Valdez', 'cashier.valdez@brightmarket.ph', '2026-02-01 09:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.valdez.jpg', '2026-02-01 09:00:00', '2026-02-01 09:00:00'),
+(4, 'cashier.santos', 'Camille Santos', 'cashier.santos@brightmarket.ph', '2026-02-01 09:15:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Cashier', 'avatars/cashier.santos.jpg', '2026-02-01 09:15:00', '2026-02-01 09:15:00'),
+(5, 'inv.navarro', 'Leo Navarro', 'inv.navarro@brightmarket.ph', '2026-02-10 10:00:00', '$2y$12$XYewY6BevthY2OoR3b92FeBE3O6YKpuOhOoAUdbSZ4ak2cwYPT5hK', 'Inventory Clerk', 'avatars/inv.navarro.jpg', '2026-02-10 10:00:00', '2026-02-10 10:00:00');
 
 INSERT INTO `customers` (`id`, `full_name`, `email`, `phone`, `created_at`, `updated_at`) VALUES
 (1, 'Teresa Mendoza', 'teresa.mendoza@gmail.com', '+63 917 482 1930', '2026-03-01 08:30:00', '2026-03-01 08:30:00'),

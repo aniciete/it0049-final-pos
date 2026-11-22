@@ -25,9 +25,10 @@ Bright-Market POS is a full-stack Point-of-Sale and Inventory Management applica
 | `/products/{product}/restore` | `POST` | `ProductController@restore` | `auth` | Restore archived product back to active inventory |
 | `/customers` (`Route::resource`) | `GET/POST/PUT/PATCH/DELETE` | `CustomerController` | `auth` | Customer directory CRUD (`sales.customer_id` preserved via `SET NULL`) |
 | `/users` (`Route::resource`) | `GET/POST/PUT/PATCH/DELETE` | `UserController` | `auth` | Staff accounts CRUD, 256&times;256 avatars, hashed passwords, deletion guards |
-| `/sales` | `GET` | `SaleController@index` | `auth` | Chronological sales history ledger + revenue & unit summary |
+| `/sales` | `GET` | `SaleController@index` | `auth` | Chronological sales history ledger with search &amp; date filters |
 | `/sales/create` | `GET` | `SaleController@create` | `auth` | Checkout register form with live order summary preview |
-| `/sales` | `POST` | `SaleController@store` | `auth` | Atomic transactional sale recording & stock deduction |
+| `/sales` | `POST` | `SaleController@store` | `auth` | Atomic transactional sale recording &amp; stock deduction |
+| `/sales/{sale}` | `GET` | `SaleController@show` | `auth` | Single transaction receipt breakdown view |
 | `/profile` | `GET/PATCH/DELETE` | `ProfileController` | `auth` | Personal profile and password management |
 | `/media/{folder}/{filename}` | `GET` | Closure (`Storage::disk('public')`) | `auth` | Serves stored `avatars` and `products` images when symlink is unavailable |
 
@@ -63,7 +64,7 @@ php artisan serve
 ```
 
 Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** and sign in at `/login` with any seeded staff account:
-- **Username or Email:** `admin.reyes` or `admin.reyes@brightmarket.test`
+- **Username or Email:** `admin.reyes` or `admin.reyes@brightmarket.ph`
 - **Password:** `POSDemo!2026`
 
 ---

@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Manila'),
+
+    'demo_hint' => (bool) env('APP_DEMO_HINT', false),
 
     /*
     |--------------------------------------------------------------------------

@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             [
                 'username' => 'admin.reyes',
                 'full_name' => 'Carlos Reyes',
-                'email' => 'admin.reyes@brightmarket.test',
+                'email' => 'admin.reyes@brightmarket.ph',
                 'email_verified_at' => now(),
                 'password' => $passwordHash,
                 'role' => 'Store Administrator',
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
             [
                 'username' => 'mgr.castro',
                 'full_name' => 'Beatriz Castro',
-                'email' => 'mgr.castro@brightmarket.test',
+                'email' => 'mgr.castro@brightmarket.ph',
                 'email_verified_at' => now(),
                 'password' => $passwordHash,
                 'role' => 'Shift Supervisor',
@@ -42,7 +42,7 @@ class UserSeeder extends Seeder
             [
                 'username' => 'cashier.valdez',
                 'full_name' => 'Daniel Valdez',
-                'email' => 'cashier.valdez@brightmarket.test',
+                'email' => 'cashier.valdez@brightmarket.ph',
                 'email_verified_at' => now(),
                 'password' => $passwordHash,
                 'role' => 'Cashier',
@@ -53,7 +53,7 @@ class UserSeeder extends Seeder
             [
                 'username' => 'cashier.santos',
                 'full_name' => 'Camille Santos',
-                'email' => 'cashier.santos@brightmarket.test',
+                'email' => 'cashier.santos@brightmarket.ph',
                 'email_verified_at' => now(),
                 'password' => $passwordHash,
                 'role' => 'Cashier',
@@ -64,7 +64,7 @@ class UserSeeder extends Seeder
             [
                 'username' => 'inv.navarro',
                 'full_name' => 'Leo Navarro',
-                'email' => 'inv.navarro@brightmarket.test',
+                'email' => 'inv.navarro@brightmarket.ph',
                 'email_verified_at' => now(),
                 'password' => $passwordHash,
                 'role' => 'Inventory Clerk',
