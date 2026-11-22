@@ -4,7 +4,7 @@
 <div class="container">
     <header class="directory-header">
         <div>
-            <h1 class="page-title">Product Catalog</h1>
+            <h1 class="page-title">Products</h1>
             <p class="page-lead">
                 {{ $viewArchived
                     ? 'Archived products remain linked to historical receipts and can be restored anytime.'
@@ -28,9 +28,6 @@
                 Archived <span class="mono-num">({{ $archivedCount }})</span>
             </a>
         </div>
-        <p class="section-meta">
-            Showing <span class="mono-num">{{ $products->count() }}</span> {{ $viewArchived ? 'archived' : 'active' }} {{ \Illuminate\Support\Str::plural('item', $products->count()) }}
-        </p>
     </div>
 
     @if ($products->isEmpty())
@@ -39,17 +36,15 @@
             <h2 class="empty-ledger-title">{{ $viewArchived ? 'No Archived Products' : 'No Active Products' }}</h2>
             <p class="empty-ledger-desc">
                 {{ $viewArchived
-                    ? 'Products archived from the active catalog appear here with their historical sales intact.'
+                    ? 'Archive a product from the Active Catalog and it will appear here with its historical sales intact.'
                     : 'Add your first retail product to enable inventory tracking and checkout sales.' }}
             </p>
-            @if ($viewArchived)
-                <a href="{{ route('products.index') }}" class="button button-secondary">Return to Active Catalog</a>
-            @else
+            @unless ($viewArchived)
                 <a href="{{ route('products.create') }}" class="button button-primary">
                     <x-icon name="plus" :size="15" />
                     <span>Add Product</span>
                 </a>
-            @endif
+            @endunless
         </div>
     @else
         <div class="table-wrapper" tabindex="0" role="region" aria-label="Product catalog directory">
@@ -68,7 +63,6 @@
                 <tbody>
                     @foreach ($products as $product)
                         @php
-                            $stockQty = (int) $product->stock_quantity;
                             $salesCount = (int) $product->sales_count;
                         @endphp
                         <tr>
@@ -76,12 +70,13 @@
                             <td data-label="Product">
                                 <div class="cell-product-lockup">
                                     <img
-                                        src="{{ $product->imageUrl() }}"
-                                        alt="{{ $product->name }} product image"
+                                        src="{{ $product->thumbUrl() }}"
+                                        alt="{{ $product->name }} photo"
                                         class="table-thumb"
                                         width="48"
                                         height="48"
-                                        loading="lazy"
+                                        loading="{{ $loop->index < 8 ? 'eager' : 'lazy' }}"
+                                        decoding="async"
                                     >
                                     <div>
                                         <a href="{{ route('products.show', $product->id) }}" class="cell-primary table-link">{{ $product->name }}</a>

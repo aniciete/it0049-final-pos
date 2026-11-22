@@ -1222,7 +1222,7 @@ code {
     object-fit: cover;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-strong);
-    background-color: var(--surface-subtle);
+    background: var(--surface-subtle) url('../images/product-placeholder.svg') center / cover no-repeat;
 }
 
 .table-thumb-square {
@@ -1322,7 +1322,7 @@ code {
     padding: var(--space-7) var(--space-5);
     text-align: center;
     background-color: var(--surface);
-    border: 1px dashed var(--border-strong);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
 }
 
@@ -2973,4 +2973,30 @@ select.form-control::picker-icon {
     .detail-attr-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Catalog Live Preview Card (Add Product) */
+.product-preview-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background-color: var(--canvas);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+}
+
+.product-preview-meta {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.product-preview-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    font-size: var(--text-sm);
+    color: var(--ink-primary);
 }

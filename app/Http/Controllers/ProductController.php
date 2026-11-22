@@ -29,7 +29,7 @@ class ProductController extends Controller
             ->get();
 
         return view('products.index', [
-            'title' => 'Products Catalog | Bright-Market POS',
+            'title' => 'Products | Bright-Market POS',
             'activePage' => 'products',
             'products' => $products,
             'viewArchived' => $viewArchived,
@@ -44,7 +44,7 @@ class ProductController extends Controller
     public function create(): View
     {
         return view('products.create', [
-            'title' => 'New Product | Bright-Market POS',
+            'title' => 'Add Product | Bright-Market POS',
             'activePage' => 'products',
             'product' => new Product(['stock_quantity' => 0]),
         ]);

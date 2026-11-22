@@ -131,5 +131,24 @@ class PosLayoutTest extends TestCase
         $this->assertStringNotContainsString('public disk', $html, "Unexpected public disk jargon on {$uri}");
         $this->assertStringNotContainsString('Bcrypt Hashed', $html, "Unexpected Bcrypt Hashed badge on {$uri}");
         $this->assertStringNotContainsString('atomically', $html, "Unexpected atomically copy on {$uri}");
+        $this->assertStringNotContainsString('Current product photo active.', $html, "Unexpected active photo filler on {$uri}");
+        $this->assertStringNotContainsString('Current avatar active.', $html, "Unexpected active avatar filler on {$uri}");
+        $this->assertStringNotContainsString('resized cleanly', $html, "Unexpected filler copy on {$uri}");
+        $this->assertStringNotContainsString('Return to Active Catalog', $html, "Unexpected redundant empty-state button on {$uri}");
+    }
+
+    public function test_catalog_and_form_label_parity_checks(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $staff = User::query()->where('username', 'admin.reyes')->firstOrFail();
+
+        $catalogHtml = $this->actingAs($staff)->get(route('products.index'))->assertOk()->getContent();
+        $this->assertStringNotContainsString('Showing ', $catalogHtml);
+        $this->assertStringContainsString('products/thumbs/', $catalogHtml);
+
+        $createProductHtml = $this->actingAs($staff)->get(route('products.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('Add Product', $createProductHtml);
+        $this->assertStringContainsString('Catalog Preview', $createProductHtml);
+        $this->assertStringNotContainsString('Save Product', $createProductHtml);
     }
 }

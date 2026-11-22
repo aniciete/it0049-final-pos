@@ -31,7 +31,7 @@
             <div class="detail-identity-row">
                 <img
                     src="{{ $product->imageUrl() }}"
-                    alt="{{ $product->name }} product image"
+                    alt="{{ $product->name }} photo"
                     class="detail-identity-avatar"
                     width="56"
                     height="56"
@@ -44,25 +44,27 @@
                 </div>
             </div>
 
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Unit Price</span>
-                <span class="detail-kv-value mono-num">${{ number_format((float) $product->price, 2) }}</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Stock Quantity</span>
-                <span class="detail-kv-value">
-                    <x-stock-indicator :quantity="$product->stock_quantity" ok-suffix="units in stock" />
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Recorded Sales</span>
-                <span class="detail-kv-value mono-num">
-                    <x-sales-count-link :count="$product->sales_count" :url="route('sales.index', ['q' => $product->name])" />
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Added On</span>
-                <span class="detail-kv-value mono-num">{{ $product->created_at?->format('M j, Y') }}</span>
+            <div class="detail-attr-grid">
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Unit Price</span>
+                    <span class="detail-attr-value mono-num">${{ number_format((float) $product->price, 2) }}</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Stock Quantity</span>
+                    <span class="detail-attr-value">
+                        <x-stock-indicator :quantity="$product->stock_quantity" ok-suffix="units in stock" />
+                    </span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Recorded Sales</span>
+                    <span class="detail-attr-value mono-num">
+                        <x-sales-count-link :count="$product->sales_count" :url="route('sales.index', ['q' => $product->name])" />
+                    </span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Added On</span>
+                    <span class="detail-attr-value mono-num">{{ $product->created_at?->format('M j, Y') }}</span>
+                </div>
             </div>
         </section>
 

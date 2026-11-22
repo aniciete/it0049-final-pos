@@ -73,7 +73,9 @@
         :default-src="$product->imageUrl()"
         :alt="($product->name ?: 'Product').' preview'"
         :has-media="$product->hasImage()"
+        help-text="Optional. JPG, PNG, or WebP up to 2 MB. Resized to 640×640 on save."
         remove-name="remove_image"
+        remove-label="Remove current product photo on save"
         error-id="product_image_error"
         :is-edit="$isEdit"
     />

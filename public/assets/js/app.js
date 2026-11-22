@@ -299,6 +299,9 @@
             }
             const previewImg = document.getElementById(input.dataset.previewImg || '');
             const statusEl = document.getElementById(input.dataset.previewStatus || '');
+            const mirrorImg = input.id === 'product-image'
+                ? document.getElementById('product-preview-card-img')
+                : null;
             const removeCheckbox = input.dataset.removeCheckbox
                 ? document.getElementById(input.dataset.removeCheckbox)
                 : null;
@@ -310,6 +313,13 @@
             const defaultSrc = previewImg.dataset.defaultSrc || previewImg.src;
             const defaultStatus = statusEl ? statusEl.textContent.trim() : '';
             let activeUrl = null;
+
+            const setPreviewSrc = (src) => {
+                previewImg.src = src;
+                if (mirrorImg instanceof HTMLImageElement) {
+                    mirrorImg.src = src;
+                }
+            };
 
             const revoke = () => {
                 if (activeUrl) {
@@ -326,7 +336,7 @@
 
                 const file = input.files && input.files[0];
                 if (!file) {
-                    previewImg.src = defaultSrc;
+                    setPreviewSrc(defaultSrc);
                     if (statusEl) {
                         statusEl.textContent = defaultStatus;
                     }
@@ -335,13 +345,13 @@
 
                 if (file.type && !ALLOWED_IMAGE_TYPES.has(file.type)) {
                     input.setCustomValidity('Please select a JPG, PNG, or WebP image file.');
-                    previewImg.src = defaultSrc;
+                    setPreviewSrc(defaultSrc);
                     return;
                 }
 
                 if (file.size > MAX_IMAGE_BYTES) {
                     input.setCustomValidity('Image file must not exceed 2 MB.');
-                    previewImg.src = defaultSrc;
+                    setPreviewSrc(defaultSrc);
                     return;
                 }
 
@@ -350,7 +360,7 @@
                 }
 
                 activeUrl = URL.createObjectURL(file);
-                previewImg.src = activeUrl;
+                setPreviewSrc(activeUrl);
 
                 if (statusEl) {
                     const kb = Math.max(1, Math.round(file.size / 1024));
@@ -491,12 +501,52 @@
         });
     }
 
+    function initProductPreview() {
+        const nameInput = document.getElementById('product-name');
+        const priceInput = document.getElementById('product-price');
+        const stockInput = document.getElementById('product-stock');
+        const nameOut = document.getElementById('product-preview-card-name');
+        const priceOut = document.getElementById('product-preview-card-price');
+        const stockOut = document.getElementById('product-preview-card-stock');
+
+        if (!nameInput || !priceInput || !stockInput || !nameOut || !priceOut || !stockOut) {
+            return;
+        }
+
+        const render = () => {
+            const name = nameInput.value.trim();
+            nameOut.textContent = name !== '' ? name : 'New Product';
+
+            const priceVal = parseFloat(priceInput.value);
+            priceOut.textContent = '$' + (Number.isFinite(priceVal) && priceVal > 0 ? priceVal : 0).toFixed(2);
+
+            const stockVal = parseInt(stockInput.value, 10);
+            const qty = Number.isFinite(stockVal) ? Math.max(0, stockVal) : 0;
+            if (qty <= 0) {
+                stockOut.className = 'status-pill status-out';
+                stockOut.textContent = 'Out of stock';
+            } else if (qty <= 5) {
+                stockOut.className = 'status-pill status-low';
+                stockOut.textContent = `${qty} low stock`;
+            } else {
+                stockOut.className = 'cell-muted';
+                stockOut.textContent = `${qty} in stock`;
+            }
+        };
+
+        nameInput.addEventListener('input', render);
+        priceInput.addEventListener('input', render);
+        stockInput.addEventListener('input', render);
+        render();
+    }
+
     initResponsiveNavbar();
     initFlashDismiss();
     initConfirmDialog();
     initPasswordToggles();
     initSubmitBusyState();
     initImagePreviews();
+    initProductPreview();
     initSalePreview();
     initDemoLoginFill();
 })();
