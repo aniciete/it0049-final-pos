@@ -154,5 +154,18 @@ class PosLayoutTest extends TestCase
         $recordSaleHtml = $this->actingAs($staff)->get(route('sales.create'))->assertOk()->getContent();
         $this->assertStringContainsString('sku-picker-grid', $recordSaleHtml);
         $this->assertStringNotContainsString('Walk-in Customer', $recordSaleHtml);
+
+        $createCustomerHtml = $this->actingAs($staff)->get(route('customers.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('Recently Added', $createCustomerHtml);
+
+        $createStaffHtml = $this->actingAs($staff)->get(route('users.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('Add Staff', $createStaffHtml);
+        $this->assertStringNotContainsString('Save Staff', $createStaffHtml);
+
+        $staffListHtml = $this->actingAs($staff)->get(route('users.index'))->assertOk()->getContent();
+        $this->assertStringContainsString('Locked', $staffListHtml);
+
+        $staffShowHtml = $this->actingAs($staff)->get(route('users.show', $staff))->assertOk()->getContent();
+        $this->assertStringNotContainsString('Account #', $staffShowHtml);
     }
 }

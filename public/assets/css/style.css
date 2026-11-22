@@ -1230,6 +1230,12 @@ code {
     color: var(--ink-primary);
 }
 
+.cell-username {
+    font-weight: 400;
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+}
+
 .cell-secondary {
     display: block;
     margin-top: 2px;
@@ -1261,6 +1267,10 @@ code {
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-strong);
     background: var(--surface-subtle) url('../images/product-placeholder.svg') center / cover no-repeat;
+}
+
+.table-thumb-avatar {
+    background: var(--surface-subtle) url('../images/avatar-placeholder.svg') center / cover no-repeat;
 }
 
 .table-thumb-square {

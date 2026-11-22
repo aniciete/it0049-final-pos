@@ -13,14 +13,16 @@
         <div class="cell-product-lockup">
             <img
                 src="{{ $user->avatarUrl() }}"
-                alt="{{ $user->full_name }} avatar"
+                alt="{{ $user->full_name }} photo"
                 class="detail-identity-avatar"
                 width="56"
                 height="56"
             >
             <div>
                 <h1 class="page-title">{{ $user->full_name }}</h1>
-                <p class="page-lead">{{ $user->role }} &middot; Account <span class="mono-num">#{{ $user->id }}</span></p>
+                <p class="page-lead">
+                    <span class="status-pill status-neutral">{{ $user->role }}</span>
+                </p>
             </div>
         </div>
         <div class="directory-header-actions">
@@ -33,33 +35,33 @@
 
     <div class="workspace-split">
         <section class="details-card" aria-label="Staff profile details">
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Role</span>
-                <span class="detail-kv-value">
-                    <span class="status-pill status-neutral">{{ $user->role }}</span>
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Username</span>
-                <span class="detail-kv-value mono-num">{{ $user->username }}</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Email Address</span>
-                <span class="detail-kv-value">{{ $user->email ?: 'Not set' }}</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Credential Status</span>
-                <span class="detail-kv-value">Password set</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Recorded Sales</span>
-                <span class="detail-kv-value mono-num">
-                    <x-sales-count-link :count="$user->sales_count" :url="route('sales.index', ['staff' => $user->id])" />
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Member Since</span>
-                <span class="detail-kv-value mono-num">{{ $user->created_at?->format('M j, Y') }}</span>
+            <div class="detail-attr-grid">
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Username</span>
+                    <span class="detail-attr-value mono-num">{{ $user->username }}</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Email Address</span>
+                    <span class="detail-attr-value">{{ $user->email ?: 'Not set' }}</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Credential Status</span>
+                    <span class="detail-attr-value">Password set</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Recorded Sales</span>
+                    <span class="detail-attr-value mono-num">
+                        <x-sales-count-link :count="$user->sales_count" :url="route('sales.index', ['staff' => $user->id])" />
+                    </span>
+                </div>
+                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                    <span class="detail-attr-label">Member Since</span>
+                    <span class="detail-attr-value mono-num">{{ $user->created_at?->format('M j, Y') }}</span>
+                </div>
+                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                    <span class="detail-attr-label">Session Status</span>
+                    <span class="detail-attr-value">{{ $user->is(Auth::user()) ? 'Current Session' : 'Staff operator' }}</span>
+                </div>
             </div>
         </section>
 

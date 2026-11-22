@@ -23,7 +23,7 @@ class CustomerController extends Controller
             ->get();
 
         return view('customers.index', [
-            'title' => 'Customer Accounts | Bright-Market POS',
+            'title' => 'Customers | Bright-Market POS',
             'activePage' => 'customers',
             'customers' => $customers,
         ]);
@@ -38,6 +38,7 @@ class CustomerController extends Controller
             'title' => 'Add Customer | Bright-Market POS',
             'activePage' => 'customers',
             'customer' => new Customer,
+            'recentCustomers' => Customer::query()->latest('id')->limit(5)->get(),
         ]);
     }
 

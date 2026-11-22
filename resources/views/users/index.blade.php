@@ -46,7 +46,7 @@
                             $canDelete = ! $isCurrent && (int) $staff->sales_count === 0;
                             $deleteDisabledReason = $isCurrent
                                 ? 'Current active account cannot be deleted.'
-                                : 'Staff members with recorded sales cannot be deleted.';
+                                : 'Has recorded sales';
                         @endphp
                         <tr>
                             <td class="num-col" data-label="ID">{{ $staff->id }}</td>
@@ -54,11 +54,12 @@
                                 <div class="cell-product-lockup">
                                     <img
                                         src="{{ $staff->avatarUrl() }}"
-                                        alt="{{ $staff->full_name }} avatar"
-                                        class="table-thumb"
+                                        alt="{{ $staff->full_name }} photo"
+                                        class="table-thumb table-thumb-avatar"
                                         width="48"
                                         height="48"
-                                        loading="lazy"
+                                        loading="{{ $loop->index < 8 ? 'eager' : 'lazy' }}"
+                                        decoding="async"
                                     >
                                     <div>
                                         <a href="{{ route('users.show', $staff) }}" class="cell-primary table-link">{{ $staff->full_name }}</a>
@@ -70,14 +71,16 @@
                             </td>
                             <td data-label="Username / Email">
                                 <div>
-                                    <span class="cell-primary mono-num">{{ $staff->username }}</span>
+                                    <span class="cell-username mono-num">{{ $staff->username }}</span>
                                     <span class="cell-secondary">{{ $staff->email ?: 'No email linked' }}</span>
                                 </div>
                             </td>
                             <td data-label="Role">
                                 <span class="status-pill status-neutral">{{ $staff->role }}</span>
                             </td>
-                            <td class="num-col mono-num" data-label="Sales">{{ $staff->sales_count }}</td>
+                            <td class="num-col mono-num" data-label="Sales">
+                                <x-sales-count-link :count="$staff->sales_count" :url="route('sales.index', ['staff' => $staff->id])" />
+                            </td>
                             <td class="col-actions" data-label="Actions">
                                 <div class="table-actions-group">
                                     <a href="{{ route('users.edit', $staff) }}" class="button button-secondary button-sm">
@@ -101,16 +104,14 @@
                                             </button>
                                         </form>
                                     @else
-                                        <button
-                                            type="button"
-                                            class="button button-ghost-danger button-sm"
-                                            disabled
+                                        <span
+                                            class="action-locked-indicator"
                                             title="{{ $deleteDisabledReason }}"
                                             aria-label="{{ $deleteDisabledReason }}"
                                         >
-                                            <x-icon name="trash" :size="14" />
-                                            <span>Delete</span>
-                                        </button>
+                                            <x-icon name="lock" :size="14" />
+                                            <span>Locked</span>
+                                        </span>
                                     @endif
                                 </div>
                             </td>

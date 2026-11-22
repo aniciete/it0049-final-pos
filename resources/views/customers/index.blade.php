@@ -4,7 +4,7 @@
 <div class="container">
     <header class="directory-header">
         <div>
-            <h1 class="page-title">Customer Accounts</h1>
+            <h1 class="page-title">Customers</h1>
             <p class="page-lead">Manage registered retail customers linked optionally to checkout sales.</p>
         </div>
         <div class="directory-header-actions">
@@ -54,7 +54,9 @@
                                     <span class="cell-muted">Not provided</span>
                                 @endif
                             </td>
-                            <td class="num-col mono-num" data-label="Orders">{{ $customer->sales_count }}</td>
+                            <td class="num-col mono-num" data-label="Orders">
+                                <x-sales-count-link :count="$customer->sales_count" :url="route('sales.index', ['customer' => $customer->id])" />
+                            </td>
                             <td class="col-actions" data-label="Actions">
                                 <div class="table-actions-group">
                                     <a href="{{ route('customers.edit', $customer) }}" class="button button-secondary button-sm">

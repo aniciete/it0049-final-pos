@@ -12,7 +12,7 @@
     <header class="directory-header">
         <div>
             <h1 class="page-title">{{ $customer->full_name }}</h1>
-            <p class="page-lead">Customer account #{{ $customer->id }}</p>
+            <p class="page-lead">Customer contact profile and linked order history.</p>
         </div>
         <div class="directory-header-actions">
             <a href="{{ route('customers.edit', $customer) }}" class="button button-primary">
@@ -24,33 +24,35 @@
 
     <div class="workspace-split">
         <section class="details-card" aria-label="Customer details">
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Full Name</span>
-                <span class="detail-kv-value">{{ $customer->full_name }}</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Email Address</span>
-                <span class="detail-kv-value">{{ $customer->email }}</span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Phone Number</span>
-                <span class="detail-kv-value">
-                    @if ($customer->phone)
-                        <span class="mono-num">{{ $customer->phone }}</span>
-                    @else
-                        <span class="cell-muted">Not provided</span>
-                    @endif
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Linked Sales</span>
-                <span class="detail-kv-value mono-num">
-                    <x-sales-count-link :count="$customer->sales_count" :url="route('sales.index', ['customer' => $customer->id])" />
-                </span>
-            </div>
-            <div class="detail-kv-row">
-                <span class="detail-kv-label">Added On</span>
-                <span class="detail-kv-value mono-num">{{ $customer->created_at?->format('M j, Y') }}</span>
+            <div class="detail-attr-grid">
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Full Name</span>
+                    <span class="detail-attr-value">{{ $customer->full_name }}</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Email Address</span>
+                    <span class="detail-attr-value">{{ $customer->email }}</span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Phone Number</span>
+                    <span class="detail-attr-value">
+                        @if ($customer->phone)
+                            <span class="mono-num">{{ $customer->phone }}</span>
+                        @else
+                            <span class="cell-muted">Not provided</span>
+                        @endif
+                    </span>
+                </div>
+                <div class="detail-attr-item">
+                    <span class="detail-attr-label">Linked Sales</span>
+                    <span class="detail-attr-value mono-num">
+                        <x-sales-count-link :count="$customer->sales_count" :url="route('sales.index', ['customer' => $customer->id])" />
+                    </span>
+                </div>
+                <div class="detail-attr-item" style="border-bottom: 0; padding-bottom: 0;">
+                    <span class="detail-attr-label">Added On</span>
+                    <span class="detail-attr-value mono-num">{{ $customer->created_at?->format('M j, Y') }}</span>
+                </div>
             </div>
         </section>
 

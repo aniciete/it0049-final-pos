@@ -16,18 +16,44 @@
         </div>
     </header>
 
-    <div class="form-card form-measure">
-        @include('partials.error_summary')
+    <div class="workspace-split">
+        <div class="form-card">
+            @include('partials.error_summary')
 
-        <form action="{{ route('customers.store') }}" method="POST" novalidate>
-            @csrf
-            @include('customers._form')
+            <form action="{{ route('customers.store') }}" method="POST" novalidate>
+                @csrf
+                @include('customers._form')
 
-            <div class="form-actions">
-                <a href="{{ route('customers.index') }}" class="button button-secondary">Cancel</a>
-                <button type="submit" class="button button-primary" data-busy-text="Adding customer...">Add Customer</button>
-            </div>
-        </form>
+                <div class="form-actions">
+                    <a href="{{ route('customers.index') }}" class="button button-secondary">Cancel</a>
+                    <button type="submit" class="button button-primary" data-busy-text="Adding customer...">Add Customer</button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="context-panel" aria-label="Recently Added Customers">
+            <h2 class="context-panel-title" style="margin-bottom: var(--space-3);">Recently Added</h2>
+
+            @if ($recentCustomers->isEmpty())
+                <p class="section-meta">No customers registered yet.</p>
+            @else
+                <ul class="context-list">
+                    @foreach ($recentCustomers as $recent)
+                        <li class="context-list-item">
+                            <a href="{{ route('customers.show', $recent) }}" class="context-list-link">
+                                <span class="context-list-top">
+                                    <span style="font-weight: 700;">{{ $recent->full_name }}</span>
+                                    <x-icon name="caret-right" :size="14" class="context-chevron" />
+                                </span>
+                                <span class="context-list-bottom">
+                                    <span>{{ $recent->email }}</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </aside>
     </div>
 </div>
 @endsection
